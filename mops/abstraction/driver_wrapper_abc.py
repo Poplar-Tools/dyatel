@@ -95,14 +95,6 @@ class DriverWrapperABC(ABC):
         """
         raise NotImplementedError()
 
-    def get_inner_window_size(self) -> Size:
-        """
-        Retrieve the inner size of the driver window.
-
-        :return: :class:`Size` - An object representing the window's dimensions.
-        """
-        raise NotImplementedError()
-
     def wait(self, timeout: Union[int, float] = WAIT_UNIT) -> DriverWrapper:
         """
         Pauses the execution for a specified amount of time.
@@ -270,16 +262,13 @@ class DriverWrapperABC(ABC):
         """
         raise NotImplementedError()
 
-    def set_window_size(self, width: int, height: int) -> DriverWrapper:
-        """
-        Set the width and height of the current window.
+    def set_window_size(self, size: Size) -> DriverWrapper:
+        raise NotImplementedError()
 
-        :param width: The width, in pixels, to set the window to.
-        :type width: int
-        :param height: The height, in pixels, to set the window to.
-        :type height: int
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
-        """
+    def get_inner_window_size(self) -> Size:
+        raise NotImplementedError()
+
+    def get_window_size(self) -> Size:
         raise NotImplementedError()
 
     def save_screenshot(

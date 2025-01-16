@@ -49,7 +49,7 @@ def test_wait_element_value_log_msg(forms_page, caplog, case):
 
 @pytest.mark.medium
 @pytest.mark.parametrize('case', [None, 'Speaks German?'], ids=['any value', 'actual value'])
-def test_wait_element_text_log_msg(forms_page, caplog, case):
+def test_log_msg_wait_element_text(forms_page, caplog, case):
     forms_page.controls_form.german_slider.wait_for_text(case)
     if case:
         assert 'Wait until text of "german language slider" will be equal to "Speaks German?"' in caplog.messages[0]

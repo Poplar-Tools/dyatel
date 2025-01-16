@@ -6,6 +6,9 @@ from typing import Union, List, Any, TYPE_CHECKING
 
 from PIL import Image
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
+
+from mops.js_scripts import get_inner_height_js, get_inner_width_js
+from mops.mixins.objects.size import Size
 from mops.shared_utils import _scaled_screenshot
 from selenium.common.exceptions import WebDriverException as SeleniumWebDriverException, NoAlertPresentException
 from selenium.webdriver.common.alert import Alert
@@ -60,6 +63,15 @@ class CoreDriver(Logging, DriverWrapperABC):
         :return: :obj:`bool`- :obj:`True` if the current driver is Firefox, otherwise :obj:`False`.
         """
         return self.browser_name.lower() == 'firefox'
+
+    def get_inner_window_size(self) -> Size:
+        return Size(
+            height=self.execute_script(get_inner_height_js),
+            width=self.execute_script(get_inner_width_js)
+        )
+
+    def get_window_size(self) -> Size:
+        return Size(**self.driver.get_window_size())
 
     def wait(self, timeout: Union[int, float] = WAIT_UNIT) -> CoreDriver:
         """

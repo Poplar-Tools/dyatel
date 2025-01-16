@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from dataclasses import astuple
 from typing import List
 
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 
+from mops.mixins.objects.size import Size
 from mops.selenium.core.core_driver import CoreDriver
 from mops.mixins.objects.driver import Driver
 
@@ -23,17 +25,14 @@ class WebDriver(CoreDriver):
 
         CoreDriver.__init__(self, driver=self.driver)
 
-    def set_window_size(self, width: int, height: int) -> WebDriver:
-        """
-        Set the width and height of the current window.
+    def set_window_size(self, size: Size) -> WebDriver:
+        outer_width, outer_height = astuple(self.get_window_size())
+        inner_width, inner_height = astuple(self.get_inner_window_size())
 
-        :param width: The width, in pixels, to set the window to.
-        :type width: int
-        :param height: The height, in pixels, to set the window to.
-        :type height: int
-        :return: :obj:`WebDriver` - The current instance of the driver wrapper.
-        """
-        self.driver.set_window_size(width, height)
+        width_diff = outer_width - inner_width
+        height_diff = outer_height - inner_height
+
+        self.driver.set_window_size(size.width + width_diff, size.height + height_diff)
         return self
 
     def get_all_tabs(self) -> List[str]:

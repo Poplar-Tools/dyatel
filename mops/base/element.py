@@ -276,7 +276,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         """
         actual_text = self.text
 
-        if expected_text:
+        if expected_text is not None:
             result = actual_text == expected_text
             error = f'Not expected text for "{self.name}"'
             log_msg = f'Wait until text of "{self.name}" will be equal to "{expected_text}"'
@@ -321,7 +321,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         """
         actual_value = self.value
 
-        if expected_value:
+        if expected_value is not None:
             result = actual_value == expected_value
             error = f'Not expected value for "{self.name}"'
             log_msg = f'Wait until value of "{self.name}" will be equal to "{expected_value}"'

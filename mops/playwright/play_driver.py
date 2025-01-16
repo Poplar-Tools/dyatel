@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from dataclasses import asdict
 from functools import cached_property
-from typing import List, Union, Any
+from typing import List, Union, Any, TYPE_CHECKING
 
 from playwright._impl._errors import Error as PlaywrightError  # noqa
 
@@ -10,9 +11,13 @@ from playwright.sync_api import Locator, Page, Browser, BrowserContext
 
 from mops.abstraction.driver_wrapper_abc import DriverWrapperABC
 from mops.mixins.objects.driver import Driver
+from mops.mixins.objects.size import Size
 from mops.shared_utils import get_image
 from mops.utils.internal_utils import get_timeout_in_ms, WAIT_UNIT
 from mops.utils.logs import Logging
+
+if TYPE_CHECKING:
+    from mops.playwright.play_element import PlayElement
 
 
 class PlayDriver(Logging, DriverWrapperABC):
@@ -31,6 +36,8 @@ class PlayDriver(Logging, DriverWrapperABC):
 
         self.original_tab = self.driver
         self.browser_name = self.instance.browser_type.name
+
+        self._base_driver = self.driver
 
     @cached_property
     def is_safari(self) -> bool:
@@ -167,7 +174,7 @@ class PlayDriver(Logging, DriverWrapperABC):
             except PlaywrightError:
                 pass
 
-        self.driver.close()
+        self._base_driver.close()
         self.context.close()
 
     def set_cookie(self, cookies: List[dict]) -> PlayDriver:
@@ -208,6 +215,26 @@ class PlayDriver(Logging, DriverWrapperABC):
         :rtype: typing.List[typing.Dict]
         """
         return self.context.cookies()
+
+    def switch_to_frame(self, frame: PlayElement) -> PlayDriver:
+        """
+        Appium/Selenium only: Switch to a specified frame.
+
+        :param frame: The frame element to switch to.
+        :type frame: Element
+        :return: :obj:`PlayDriver` - The current instance of the driver wrapper.
+        """
+        self.driver = frame.element.content_frame
+        return self
+
+    def switch_to_default_content(self) -> PlayDriver:
+        """
+        Appium/Selenium only: Switch back to the default content from a frame.
+
+        :return: :obj:`PlayDriver` - The current instance of the driver wrapper.
+        """
+        self.driver = self._base_driver
+        return self
 
     def execute_script(self, script: str, *args) -> Any:
         """
@@ -255,18 +282,17 @@ class PlayDriver(Logging, DriverWrapperABC):
         self.driver.set_default_navigation_timeout(get_timeout_in_ms(timeout))
         return self
 
-    def set_window_size(self, width: int, height: int) -> PlayDriver:
-        """
-        Set the width and height of the current window.
-
-        :param width: The width, in pixels, to set the window to.
-        :type width: int
-        :param height: The height, in pixels, to set the window to.
-        :type height: int
-        :return: :obj:`PlayDriver` - The current instance of the driver wrapper.
-        """
-        self.driver.set_viewport_size({'width': width, 'height': height})
+    def set_window_size(self, size: Size) -> PlayDriver:
+        self.driver.set_viewport_size(asdict(size))
         return self
+
+    def get_inner_window_size(self) -> Size:
+        return Size(**self.driver.viewport_size)
+
+    def get_window_size(self) -> Size:
+        width = self.execute_script('return window.outerWidth')
+        height = self.execute_script('return window.outerHeight')
+        return Size(width=width, height=height)
 
     def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """

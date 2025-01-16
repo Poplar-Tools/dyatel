@@ -693,7 +693,7 @@ requires-dist = [
     { name = "opencv-python", marker = "python_full_version >= '3.11'", specifier = ">=4.10.0.84" },
     { name = "pillow", marker = "python_full_version >= '3.8' and python_full_version < '3.12'", specifier = ">=9.4.0,<10.4.0" },
     { name = "pillow", marker = "python_full_version >= '3.12'", specifier = ">=10.4.0" },
-    { name = "playwright", specifier = ">=1.41.0" },
+    { name = "playwright", specifier = ">=1.43.0" },
     { name = "scikit-image", marker = "python_full_version >= '3.8' and python_full_version < '3.11'", specifier = ">=0.20.0,<0.24.0" },
     { name = "scikit-image", marker = "python_full_version >= '3.11'", specifier = ">=0.24.0" },
     { name = "selenium", specifier = ">=4.12.0" },
@@ -706,7 +706,7 @@ dev = [
     { name = "furo", specifier = "==2024.8.6" },
     { name = "mock", specifier = "==4.0.3" },
     { name = "myst-parser", specifier = "==3.0.1" },
-    { name = "playwright", specifier = "==1.41.0" },
+    { name = "playwright", specifier = "==1.43.0" },
     { name = "pytest", specifier = "==7.4.3" },
     { name = "pytest-rerunfailures", specifier = "==11.1" },
     { name = "selenium", specifier = "==4.12.0" },
@@ -1189,21 +1189,20 @@ wheels = [
 
 [[package]]
 name = "playwright"
-version = "1.41.0"
+version = "1.43.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "greenlet" },
     { name = "pyee" },
-    { name = "typing-extensions", marker = "python_full_version < '3.9'" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/11/f0/079b624c1beba8b78d0b154c66c49eaaad4849c472db1a51f5334e968b7f/playwright-1.41.0-py3-none-macosx_10_13_x86_64.whl", hash = "sha256:ad3ff4805fd21b91c9acbc5b27e62bf0ac6a235e93f91d9dd6d311d5e988b069", size = 34309798 },
-    { url = "https://files.pythonhosted.org/packages/8d/63/239ffc94f3856932ea8cf4bf4c2cebeda8442ccdcf2e685882ab666b244b/playwright-1.41.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:9d34f472d174e55d8f12265e10d11ba21be99bf0661ccbf1f9b048312696d5e8", size = 32646923 },
-    { url = "https://files.pythonhosted.org/packages/d9/8f/486ed8e9dcae2041c3e068c002d89ce82ae751d19e517dfce15b03411d5e/playwright-1.41.0-py3-none-macosx_11_0_universal2.whl", hash = "sha256:f3f0841360652ddd77f6e059074d5079dd37b487168a2972efbf13cd23fbacb0", size = 34309796 },
-    { url = "https://files.pythonhosted.org/packages/a1/14/026f013297d5fc57362f9adc145d9d7024adc240290445498e97f89b690a/playwright-1.41.0-py3-none-manylinux1_x86_64.whl", hash = "sha256:b56c1d564df9a2b2ab393f8161b71bcc16df38ade60115e1162ad6d9f116c89b", size = 37361729 },
-    { url = "https://files.pythonhosted.org/packages/3d/7b/7132cb5a107b9af274a9e5fdc09d0cc68e62114e8d3862dff7118066c14e/playwright-1.41.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:9ccf3214b0cdd932bcdc04794ecafe50bd386e8523ce4681969aac86d3326f87", size = 37108804 },
-    { url = "https://files.pythonhosted.org/packages/66/81/0daeb9d1c389c6aaec8a6912d9bf8062e59786a26504137f7bbeb959d635/playwright-1.41.0-py3-none-win32.whl", hash = "sha256:46d4aaed0071db67361900a2027bb14dba74f9eb102cf2baf1876c0ff0c15da6", size = 29421960 },
-    { url = "https://files.pythonhosted.org/packages/3d/4b/c26bc19df06a167ffffcc1e4f132a6e95b24b21836291f660bc12562d605/playwright-1.41.0-py3-none-win_amd64.whl", hash = "sha256:925045824dc3d505c8f197c94a083e4619d7c268d7c3465d73a5a09040dc8b85", size = 29421966 },
+    { url = "https://files.pythonhosted.org/packages/62/10/f0638cbcd25d2e5d06e23aa55f4a575b062e6f35670a46adc53dd5ebcc63/playwright-1.43.0-py3-none-macosx_10_13_x86_64.whl", hash = "sha256:b03b12bd4da9c2cfb78dff820deac8b52892fe3c2f89a4d95d6f08c59e41deb9", size = 34294956 },
+    { url = "https://files.pythonhosted.org/packages/4d/fc/e7c1a8696911e5faaa5c480f649deccf633aa2a235c91664748471490576/playwright-1.43.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:e9ec21b141727392f630761c7f4dec46d80c98243614257cc501b64ff636d337", size = 32632083 },
+    { url = "https://files.pythonhosted.org/packages/e2/c8/ad2c5ca177c0665648dff1f03d45a965fdcae7ff43849947c98e90f0082e/playwright-1.43.0-py3-none-macosx_11_0_universal2.whl", hash = "sha256:e05a8d8fb2040c630429cca07e843c8fa33059717837c8f50c01b7d1fc651ce1", size = 34294953 },
+    { url = "https://files.pythonhosted.org/packages/8b/5c/fe3e42ea46038ec69a0c0fd4b8f8d9a633577f5b3c0368b67d73ee33e910/playwright-1.43.0-py3-none-manylinux1_x86_64.whl", hash = "sha256:50d9a5c07c76456945a2296d63f78fdf6eb11aed3e8d39bb5ccbda760a8d6d41", size = 37346891 },
+    { url = "https://files.pythonhosted.org/packages/e4/5a/511e97a2a08a49628ab69f5ad2892e893a177ed69cdb0663c30586bfee63/playwright-1.43.0-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:87191272c40b4c282cf2c9449ca3acaf705f38ac6e2372270f1617ce16b661b8", size = 37093964 },
+    { url = "https://files.pythonhosted.org/packages/4a/a3/c3d10726e3f9ffbc50a3dbf6566aefd806f614af4807674f3c07ea357a52/playwright-1.43.0-py3-none-win32.whl", hash = "sha256:bd8b818904b17e2914be23e7bc2a340b203f57fe81678520b10f908485b056ea", size = 29407139 },
+    { url = "https://files.pythonhosted.org/packages/33/a1/0bfb6705415a7a268b693b10fbbf6638bcbf86a8ea7db735f67ef6252cf7/playwright-1.43.0-py3-none-win_amd64.whl", hash = "sha256:9b7bd707eeeaebee47f656b2de90aa9bd85e9ca2c6af7a08efd73896299e4d50", size = 29407143 },
 ]
 
 [[package]]
@@ -1226,14 +1225,14 @@ wheels = [
 
 [[package]]
 name = "pyee"
-version = "11.0.1"
+version = "11.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/10/88/c9a028db29f009170db6337a5096476a12448ffce437bbf91458fd5b5767/pyee-11.0.1.tar.gz", hash = "sha256:a642c51e3885a33ead087286e35212783a4e9b8d6514a10a5db4e57ac57b2b29", size = 27877 }
+sdist = { url = "https://files.pythonhosted.org/packages/f7/22/b4c7f3d9579204a014c4eda0e019e6bfe56af52a96cacc82004b60eec079/pyee-11.1.0.tar.gz", hash = "sha256:b53af98f6990c810edd9b56b87791021a8f54fd13db4edd1142438d44ba2263f", size = 29806 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7a/40/bfe7fd2cb55ca7dbb4c56e9f0060567c3e84dd9bdf8a782261f1d2d7c32f/pyee-11.0.1-py3-none-any.whl", hash = "sha256:9bcc9647822234f42c228d88de63d0f9ffa881e87a87f9d36ddf5211f6ac977d", size = 15249 },
+    { url = "https://files.pythonhosted.org/packages/16/cc/5cea8a0a0d3deb90b5a0d39ad1a6a1ccaa40a9ea86d793eb8a49d32a6ed0/pyee-11.1.0-py3-none-any.whl", hash = "sha256:5d346a7d0f861a4b2e6c47960295bd895f816725b27d656181947346be98d7c1", size = 15263 },
 ]
 
 [[package]]

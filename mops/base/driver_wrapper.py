@@ -175,17 +175,6 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         self._base_cls.quit(self, trace_path)
         self.session.remove_session(self)
 
-    def get_inner_window_size(self) -> Size:
-        """
-        Retrieve the inner size of the driver window.
-
-        :return: :class:`Size` - An object representing the window's dimensions.
-        """
-        return Size(
-            height=self.execute_script(get_inner_height_js),
-            width=self.execute_script(get_inner_width_js)
-        )
-
     def save_screenshot(
             self,
             file_name: str,

@@ -4,6 +4,7 @@ from mops.base.driver_wrapper import DriverWrapper
 from tests.adata.pages.mouse_event_page import MouseEventPage
 from tests.adata.pages.pizza_order_page import PizzaOrderPage
 from tests.adata.pages.playground_main_page import SecondPlaygroundMainPage
+from tests.conftest import DESKTOP_WINDOW_SIZE
 
 
 @pytest.mark.skip_platform('chrome', 'firefox', reason='Test case is not relevant for current driver')
@@ -117,6 +118,24 @@ def test_second_driver_by_arg(driver_wrapper, second_driver_wrapper):
 def test_second_driver_compatibility(driver_wrapper, second_driver_wrapper):
     assert driver_wrapper.get_inner_window_size()
     assert second_driver_wrapper.get_inner_window_size()
+
+
+def test_get_inner_window_size(driver_wrapper):
+    inner_size = driver_wrapper.get_inner_window_size()
+    if driver_wrapper.is_desktop:
+        assert inner_size == DESKTOP_WINDOW_SIZE
+    elif driver_wrapper.is_mobile:
+        assert inner_size.width > 400
+        assert inner_size.height > 700
+    else:
+        raise Exception('Unexpected behaviour')
+
+
+def test_window_size(driver_wrapper):
+    inner_size = driver_wrapper.get_inner_window_size()
+    window_size = driver_wrapper.get_window_size()
+    assert inner_size.width <= window_size.width
+    assert inner_size.height < window_size.height
 
 
 @pytest.mark.skip_platform('android', 'ios', reason='Appium doesnt support tabs creating')
