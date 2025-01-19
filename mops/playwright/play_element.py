@@ -507,7 +507,7 @@ class PlayElement(ElementABC, Logging, ABC):
         """
         Get the size of the current element, including width and height.
 
-        :return: :class:`Size` - An object representing the element's dimensions.
+        :return: :class:`.Size` - An object representing the element's dimensions.
         """
         box = self.element.first.bounding_box()
         return Size(width=box['width'], height=box['height'])

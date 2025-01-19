@@ -145,7 +145,7 @@ class MobileElement(CoreElement, ABC):
         """
         Get the size of the current element, including width and height.
 
-        :return: :class:`Size` - An object representing the element's dimensions.
+        :return: :class:`.Size` - An object representing the element's dimensions.
         """
         if self.driver_wrapper.is_native_context:
             return Size(**self.element.size)

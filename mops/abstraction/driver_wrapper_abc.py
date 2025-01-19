@@ -211,7 +211,7 @@ class DriverWrapperABC(ABC):
 
     def switch_to_frame(self, frame: Element) -> DriverWrapper:
         """
-        Appium/Selenium only: Switch to a specified frame.
+        Switch to a specified frame.
 
         :param frame: The frame element to switch to.
         :type frame: Element
@@ -221,7 +221,7 @@ class DriverWrapperABC(ABC):
 
     def switch_to_default_content(self) -> DriverWrapper:
         """
-        Appium/Selenium only: Switch back to the default content from a frame.
+        Switch back to the default content from a frame.
 
         :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
         """
@@ -263,12 +263,34 @@ class DriverWrapperABC(ABC):
         raise NotImplementedError()
 
     def set_window_size(self, size: Size) -> DriverWrapper:
+        """
+        Set the inner window size (viewport) of the current browser context.
+
+        :param size: The desired inner window size as a :class:`.Size` object.
+        :return: The current instance of :class:`DriverWrapper`.
+        """
         raise NotImplementedError()
 
     def get_inner_window_size(self) -> Size:
+        """
+        Retrieve the inner window size (viewport) of the current browser context.
+
+        :return: The size of the inner window as a :class:`.Size` object.
+        """
         raise NotImplementedError()
 
     def get_window_size(self) -> Size:
+        """
+        Retrieve the outer window size of the current browser context.
+
+        .. note::
+            Playwright behaves differently in headless mode, where the reported window
+             size may not reflect the actual dimensions.
+            In contrast, Appium does not support retrieving the window size in the
+             same way as traditional web browsers.
+
+        :return: The size of the outer window as a :class:`.Size` object.
+        """
         raise NotImplementedError()
 
     def save_screenshot(
@@ -297,9 +319,9 @@ class DriverWrapperABC(ABC):
             name_suffix: str = '',
             threshold: Union[int, float] = None,
             delay: Union[int, float] = None,
-            remove: Union[Any, List[Any]] = None,
+            remove: Union[Element, List[Element]] = None,
             cut_box: CutBox = None,
-            hide: Union[Any, List[Any]] = None,
+            hide: Union[Element, List[Element]] = None,
     ) -> None:
         """
         Asserts that the given screenshot matches the currently taken screenshot.
@@ -339,9 +361,9 @@ class DriverWrapperABC(ABC):
             name_suffix: str = '',
             threshold: Union[int, float] = None,
             delay: Union[int, float] = None,
-            remove: Union[Any, List[Any]] = None,
+            remove: Union[Element, List[Element]] = None,
             cut_box: CutBox = None,
-            hide: Union[Any, List[Any]] = None,
+            hide: Union[Element, List[Element]] = None,
     ) -> Tuple[bool, str]:
         """
         Compares the currently taken screenshot to the expected screenshot and returns a result.

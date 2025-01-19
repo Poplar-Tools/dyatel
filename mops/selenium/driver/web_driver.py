@@ -26,6 +26,12 @@ class WebDriver(CoreDriver):
         CoreDriver.__init__(self, driver=self.driver)
 
     def set_window_size(self, size: Size) -> WebDriver:
+        """
+        Set the inner window size (viewport) of the current browser context.
+
+        :param size: The desired inner window size as a :class:`.Size` object.
+        :return: The current instance of :class:`WebDriver`.
+        """
         outer_width, outer_height = astuple(self.get_window_size())
         inner_width, inner_height = astuple(self.get_inner_window_size())
 

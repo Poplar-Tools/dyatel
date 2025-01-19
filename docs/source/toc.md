@@ -33,6 +33,16 @@ other/visual_comparison
 other/locator_object
 ```
 
+```{toctree}
+---
+maxdepth: 3
+includehidden:
+caption: Kitchen Sink
+---
+
+kitchen_sink/index
+```
+
 
 ```{toctree}
 ---

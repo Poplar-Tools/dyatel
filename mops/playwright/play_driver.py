@@ -17,7 +17,7 @@ from mops.utils.internal_utils import get_timeout_in_ms, WAIT_UNIT
 from mops.utils.logs import Logging
 
 if TYPE_CHECKING:
-    from mops.playwright.play_element import PlayElement
+    from mops.base.element import Element
 
 
 class PlayDriver(Logging, DriverWrapperABC):
@@ -216,9 +216,9 @@ class PlayDriver(Logging, DriverWrapperABC):
         """
         return self.context.cookies()
 
-    def switch_to_frame(self, frame: PlayElement) -> PlayDriver:
+    def switch_to_frame(self, frame: Element) -> PlayDriver:
         """
-        Appium/Selenium only: Switch to a specified frame.
+        Switch to a specified frame.
 
         :param frame: The frame element to switch to.
         :type frame: Element
@@ -229,7 +229,7 @@ class PlayDriver(Logging, DriverWrapperABC):
 
     def switch_to_default_content(self) -> PlayDriver:
         """
-        Appium/Selenium only: Switch back to the default content from a frame.
+        Switch back to the default content from a frame.
 
         :return: :obj:`PlayDriver` - The current instance of the driver wrapper.
         """
@@ -283,13 +283,35 @@ class PlayDriver(Logging, DriverWrapperABC):
         return self
 
     def set_window_size(self, size: Size) -> PlayDriver:
+        """
+        Set the inner window size (viewport) of the current browser context.
+
+        :param size: The desired inner window size as a :class:`.Size` object.
+        :return: The current instance of :class:`PlayDriver`.
+        """
         self.driver.set_viewport_size(asdict(size))
         return self
 
     def get_inner_window_size(self) -> Size:
+        """
+        Retrieve the inner window size (viewport) of the current browser context.
+
+        :return: The size of the inner window as a :class:`.Size` object.
+        """
         return Size(**self.driver.viewport_size)
 
     def get_window_size(self) -> Size:
+        """
+        Retrieve the outer window size of the current browser context.
+
+        .. note::
+            Playwright behaves differently in headless mode, where the reported window
+             size may not reflect the actual dimensions.
+            In contrast, Appium does not support retrieving the window size in the
+             same way as traditional web browsers.
+
+        :return: The size of the outer window as a :class:`.Size` object.
+        """
         width = self.execute_script('return window.outerWidth')
         height = self.execute_script('return window.outerHeight')
         return Size(width=width, height=height)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union, Type, List, Tuple, Any, TYPE_CHECKING
+from typing import Union, Type, List, Tuple, TYPE_CHECKING
 
 from PIL import Image
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -25,7 +25,7 @@ from mops.utils.logs import Logging, LogLevel
 
 
 if TYPE_CHECKING:
-    from mops.base.element import Element  # Import the concrete class for documentation purposes
+    from mops.base.element import Element
 
 
 class DriverWrapperSessions:
@@ -214,9 +214,9 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             name_suffix: str = '',
             threshold: Union[int, float] = None,
             delay: Union[int, float] = None,
-            remove: Union[Any, List[Any]] = None,
+            remove: Union[Element, List[Element]] = None,
             cut_box: CutBox = None,
-            hide: Union[Any, List[Any]] = None,
+            hide: Union[Element, List[Element]] = None,
     ) -> None:
         """
         Asserts that the given screenshot matches the currently taken screenshot.
@@ -268,9 +268,9 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             name_suffix: str = '',
             threshold: Union[int, float] = None,
             delay: Union[int, float] = None,
-            remove: Union[Any, List[Any]] = None,
+            remove: Union[Element, List[Element]] = None,
             cut_box: CutBox = None,
-            hide: Union[Any, List[Any]] = None,
+            hide: Union[Element, List[Element]] = None,
     ) -> Tuple[bool, str]:
         """
         Compares the currently taken screenshot to the expected screenshot and returns a result.

@@ -65,12 +65,28 @@ class CoreDriver(Logging, DriverWrapperABC):
         return self.browser_name.lower() == 'firefox'
 
     def get_inner_window_size(self) -> Size:
+        """
+        Retrieve the inner window size (viewport) of the current browser context.
+
+        :return: The size of the inner window as a :class:`.Size` object.
+        """
         return Size(
             height=self.execute_script(get_inner_height_js),
             width=self.execute_script(get_inner_width_js)
         )
 
     def get_window_size(self) -> Size:
+        """
+        Retrieve the outer window size of the current browser context.
+
+        .. note::
+            Playwright behaves differently in headless mode, where the reported window
+             size may not reflect the actual dimensions.
+            In contrast, Appium does not support retrieving the window size in the
+             same way as traditional web browsers.
+
+        :return: The size of the outer window as a :class:`.Size` object.
+        """
         return Size(**self.driver.get_window_size())
 
     def wait(self, timeout: Union[int, float] = WAIT_UNIT) -> CoreDriver:
@@ -257,7 +273,7 @@ class CoreDriver(Logging, DriverWrapperABC):
 
     def switch_to_frame(self, frame: Element) -> CoreDriver:
         """
-        Appium/Selenium only: Switch to a specified frame.
+        Switch to a specified frame.
 
         :param frame: The frame element to switch to.
         :type frame: Element
@@ -268,7 +284,7 @@ class CoreDriver(Logging, DriverWrapperABC):
 
     def switch_to_default_content(self) -> CoreDriver:
         """
-        Appium/Selenium only: Switch back to the default content from a frame.
+        Switch back to the default content from a frame.
 
         :return: :obj:`CoreDriver` - The current instance of the driver wrapper.
         """

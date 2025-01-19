@@ -401,7 +401,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             silent: bool = False
     ) -> Element:
         """
-        Wait until element size will be equal to given :class:`Size` object
+        Wait until element size will be equal to given :class:`.Size` object
 
         **Note:** The method requires the use of named arguments except ``expected_size``.
 
@@ -417,7 +417,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
           with each iteration during the waiting process.
 
         :param expected_size: expected element size
-        :type expected_size: :class:`Size`
+        :type expected_size: :class:`.Size`
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
         :type timeout: int or float
         :param silent: If :obj:`True`, suppresses logging.
