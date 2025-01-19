@@ -132,6 +132,7 @@ def test_get_inner_window_size(driver_wrapper):
 
 
 def test_window_size(driver_wrapper):
+    # failure for headless playwright
     inner_size = driver_wrapper.get_inner_window_size()
     window_size = driver_wrapper.get_window_size()
     assert inner_size.width <= window_size.width
