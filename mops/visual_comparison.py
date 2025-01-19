@@ -160,7 +160,7 @@ class VisualComparison:
 
             self._attach_allure_diff(reference_file, reference_file, reference_file)
             raise AssertionError(f'Reference file "{reference_file}" not found, but its just saved. '
-                                 f'If it CI run, then you need to commit reference files.')
+                                 f'If it CI run, then you need to commit reference files.') from None
 
         if self.visual_reference_generation and not self.soft_visual_reference_generation:
             return self
@@ -276,7 +276,7 @@ class VisualComparison:
             cv2.imwrite(diff_file, scaled_image)
             raise AssertionError(f"↓\nImage size (width, height) is not same for '{self.screenshot_name}':"
                                  f"\nExpected: {reference_image.shape[0:2]};"
-                                 f"\nActual: {output_image.shape[0:2]}.")
+                                 f"\nActual: {output_image.shape[0:2]}.") from None
 
         diff, actual_threshold = self._get_difference(reference_image, output_image, threshold)
         is_different = actual_threshold > threshold
@@ -295,7 +295,7 @@ class VisualComparison:
             raise AssertionError(f"{base_error}:"
                                  f"\nThreshold is: {actual_threshold};"
                                  f"\nPossible threshold is: {threshold}"
-                                 + additional_data)
+                                 + additional_data) from None
 
         return self
 

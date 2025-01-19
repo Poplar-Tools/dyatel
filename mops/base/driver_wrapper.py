@@ -1,15 +1,17 @@
 from __future__ import annotations
 
-from functools import cached_property
 from typing import Union, Type, List, Tuple, Any, TYPE_CHECKING
 
 from PIL import Image
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
-from playwright.sync_api import Page as PlaywrightDriver
+from playwright.sync_api import (
+    Page as PlaywrightDriver,
+    Browser as PlaywrightBrowser,
+    BrowserContext as PlaywrightContext,
+)
 
 from mops.mixins.objects.cut_box import CutBox
-from mops.mixins.objects.size import Size
 from mops.mixins.objects.driver import Driver
 from mops.visual_comparison import VisualComparison
 from mops.abstraction.driver_wrapper_abc import DriverWrapperABC
@@ -17,7 +19,6 @@ from mops.playwright.play_driver import PlayDriver
 from mops.selenium.driver.mobile_driver import MobileDriver
 from mops.selenium.driver.web_driver import WebDriver
 from mops.exceptions import DriverWrapperException
-from mops.js_scripts import get_inner_height_js, get_inner_width_js
 from mops.mixins.internal_mixin import InternalMixin
 from mops.utils.internal_utils import get_attributes_from_object, get_child_elements_with_names
 from mops.utils.logs import Logging, LogLevel
@@ -83,12 +84,13 @@ class DriverWrapperSessions:
 class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
     """ Driver object crossroad """
 
+    driver: Union[SeleniumDriver, AppiumDriver, PlaywrightDriver]
+    context: PlaywrightContext
+    browser: PlaywrightBrowser
+
     _object: str = 'driver_wrapper'
     _base_cls: Type[PlayDriver, MobileDriver, WebDriver] = None
-
-    driver: Union[SeleniumDriver, AppiumDriver, PlaywrightDriver]
     session: DriverWrapperSessions = DriverWrapperSessions
-
     anchor: Union[Element, None] = None
 
     is_desktop: bool = False

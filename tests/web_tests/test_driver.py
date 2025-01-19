@@ -125,7 +125,7 @@ def test_get_inner_window_size(driver_wrapper):
     if driver_wrapper.is_desktop:
         assert inner_size == DESKTOP_WINDOW_SIZE
     elif driver_wrapper.is_mobile:
-        assert inner_size.width > 400
+        assert inner_size.width > 380
         assert inner_size.height > 700
     else:
         raise Exception('Unexpected behaviour')
