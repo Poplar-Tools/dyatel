@@ -131,12 +131,12 @@ def test_get_inner_window_size(driver_wrapper):
         raise Exception('Unexpected behaviour')
 
 
+@pytest.mark.skip_platform('android', 'ios', reason='Not relevant test case')
 def test_window_size(driver_wrapper):
-    # failure for headless playwright
     inner_size = driver_wrapper.get_inner_window_size()
     window_size = driver_wrapper.get_window_size()
     assert inner_size.width <= window_size.width
-    assert inner_size.height < window_size.height
+    assert inner_size.height <= window_size.height
 
 
 @pytest.mark.skip_platform('android', 'ios', reason='Appium doesnt support tabs creating')

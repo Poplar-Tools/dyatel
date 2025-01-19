@@ -381,7 +381,8 @@ class CoreElement(ElementABC, ABC):
 
         :return: :class:`str` - element value
         """
-        return self.get_attribute('value', silent=True)
+        value = self.get_attribute('value', silent=True)
+        return '' if value is None else value
 
     def is_available(self) -> bool:
         """
