@@ -23,7 +23,7 @@ jobs:
         python-version: [ "3.8", "3.12.7" ]  # 3.12.8 (latest) throws unexpected error inside container
 
     container:
-      image: mcr.microsoft.com/playwright/python:v1.43.0-jammy
+      image: mcr.microsoft.com/playwright/python:v1.48.0-noble
       options: --ipc=host
 
     steps:
