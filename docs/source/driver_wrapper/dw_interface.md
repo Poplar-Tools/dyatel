@@ -20,4 +20,5 @@ Additionally, it offers advanced methods which be found below.
    :members:
    :undoc-members:
    :inherited-members:
+   :special-members: __init__
 ```

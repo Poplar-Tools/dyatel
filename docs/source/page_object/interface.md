@@ -1,4 +1,4 @@
-# Page Interface
+# Page Interface 
 
 ```{warning}
 This is auto-generated interface documentation for the abstract `Page` class. 
@@ -20,4 +20,5 @@ These methods could be found below.
    :members:
    :undoc-members:
    :inherited-members:
+   :special-members: __init__
 ```

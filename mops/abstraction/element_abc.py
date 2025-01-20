@@ -5,6 +5,7 @@ from typing import Union, Any, List, Tuple, Optional, TYPE_CHECKING
 
 from PIL.Image import Image
 from appium.webdriver.extensions.location import Location
+
 from mops.mixins.objects.cut_box import CutBox
 from mops.mixins.objects.scrolls import ScrollTo, ScrollTypes
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
@@ -17,16 +18,16 @@ from mops.mixins.objects.size import Size
 from mops.utils.internal_utils import WAIT_EL, QUARTER_WAIT_EL
 
 if TYPE_CHECKING:
+    from mops.mixins.objects.locator import Locator
     from mops.base.element import Element
 
 
 class ElementABC(MixinABC, ABC):
 
-    locator: str = None
-    locator_type: str = None
-    name: str = None
-    parent: Optional[Element] = None
-    wait: bool = None
+    locator: Union[Locator, str]
+    name: str = ''
+    parent: Union[Any, bool, None] = None
+    wait: Optional[bool] = None
 
     @property
     def element(self) -> Union[SeleniumWebElement, AppiumWebElement, PlayWebElement]:
@@ -383,7 +384,7 @@ class ElementABC(MixinABC, ABC):
         """
         Get the location of the current element, including the x and y coordinates.
 
-        :return: :class:`Location` - An object representing the element's position.
+        :return: :class:`.Location` - An object representing the element's position.
         """
         raise NotImplementedError()
 
@@ -529,7 +530,7 @@ class ElementABC(MixinABC, ABC):
         :param expected_text: The text to wait for. :obj:`None` - any text; :class:`str` - expected text.
         :type expected_text: typing.Optional[str]
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -562,7 +563,7 @@ class ElementABC(MixinABC, ABC):
         :param expected_value: The value to waiting for. :obj:`None` - any value; :class:`str` - expected value.
         :type expected_value: typing.Optional[str]
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -592,7 +593,7 @@ class ElementABC(MixinABC, ABC):
           with each iteration during the waiting process.
 
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`QUARTER_WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -622,7 +623,7 @@ class ElementABC(MixinABC, ABC):
           with each iteration during the waiting process.
 
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`QUARTER_WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -647,7 +648,7 @@ class ElementABC(MixinABC, ABC):
           with each iteration during the waiting process.
 
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -705,7 +706,7 @@ class ElementABC(MixinABC, ABC):
         :param expected_size: expected element size
         :type expected_size: :class:`.Size`
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -748,12 +749,12 @@ class ElementABC(MixinABC, ABC):
         """
         Scrolls the element into view using a JavaScript script.
 
-        :param block: The scrolling block alignment. One of the :class:`ScrollTo` options.
+        :param block: The scrolling block alignment. One of the :class:`.ScrollTo` options.
         :type block: ScrollTo
-        :param behavior: The scrolling behavior. One of the :class:`ScrollTypes` options.
+        :param behavior: The scrolling behavior. One of the :class:`.ScrollTypes` options.
         :type behavior: ScrollTypes
         :param sleep: Delay in seconds after scrolling. Can be an integer or a float.
-        :type sleep: int or float
+        :type sleep: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -787,10 +788,10 @@ class ElementABC(MixinABC, ABC):
         :type name_suffix: str
         :param threshold: The acceptable threshold for comparing screenshots.
           If :obj:`None` - takes default threshold or calculate its automatically based on screenshot size.
-        :type threshold: typing.Optional[int or float]
+        :type threshold: typing.Optional[int, float]
         :param delay: The delay in seconds before taking the screenshot.
           If :obj:`None` - takes default delay.
-        :type delay: typing.Optional[int or float]
+        :type delay: typing.Optional[int, float]
         :param scroll: Whether to scroll to the element before taking the screenshot.
         :type scroll: bool
         :param remove: :class:`Element` to remove from the screenshot.
@@ -836,10 +837,10 @@ class ElementABC(MixinABC, ABC):
         :type name_suffix: str
         :param threshold: The acceptable threshold for comparing screenshots.
           If :obj:`None` - takes default threshold or calculate its automatically based on screenshot size.
-        :type threshold: typing.Optional[int or float]
+        :type threshold: typing.Optional[int, float]
         :param delay: The delay in seconds before taking the screenshot.
           If :obj:`None` - takes default delay.
-        :type delay: typing.Optional[int or float]
+        :type delay: typing.Optional[int, float]
         :param scroll: Whether to scroll to the element before taking the screenshot.
         :type scroll: bool
         :param remove: :class:`Element` to remove from the screenshot.

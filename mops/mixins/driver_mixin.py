@@ -11,13 +11,13 @@ from mops.base.driver_wrapper import DriverWrapper, DriverWrapperSessions
 
 def get_driver_wrapper_from_object(obj: Union[DriverWrapper, Any]):
     """
-    Retrieves the driver wrapper from a given object. The object can either be a :class:`DriverWrapper` instance
+    Retrieves the driver wrapper from a given object. The object can either be a :class:`.DriverWrapper` instance
       or an object that contains a ``driver_wrapper`` attribute.
 
-    :param obj: The source object, which can either be a :class:`DriverWrapper` instance or an object that
+    :param obj: The source object, which can either be a :class:`.DriverWrapper` instance or an object that
       contains a `driver_wrapper` attribute.
-    :type obj: DriverWrapper or typing.Any
-    :return: The extracted :class:`DriverWrapper` instance.
+    :type obj: :class:`.DriverWrapper` or :obj:`typing.Any`
+    :return: The extracted :class:`.DriverWrapper` instance.
     :raises Exception: If the object does not contain a ``driver_wrapper`` attribute or is of an invalid type.
     """
     if obj is None:
@@ -55,7 +55,7 @@ class DriverMixin:
         """
         Retrieves the driver wrapper instance.
 
-        :return: The current :class:`DriverWrapper` instance that assigned for this object.
+        :return: The current :obj:`.DriverWrapper` instance that assigned for this object.
         :rtype: DriverWrapper
         """
         return self._driver_wrapper
@@ -65,7 +65,7 @@ class DriverMixin:
         """
         Sets the driver wrapper instance, for this object.
 
-        :param driver_wrapper: The class:`DriverWrapper` instance to be set.
+        :param driver_wrapper: The :class:`.DriverWrapper` instance to be set.
         :type driver_wrapper: DriverWrapper
         """
         self._driver_wrapper = driver_wrapper

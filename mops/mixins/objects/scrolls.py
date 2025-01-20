@@ -1,15 +1,17 @@
-# TODO: next_version - inherit from Enum
 class ScrollTo:
-    START = 'start'
-    CENTER = 'center'
-    END = 'end'
-    NEAREST = 'nearest'
+    """ Defines available scroll positioning options. """
+
+    START: str = 'start'
+    CENTER: str = 'center'
+    END: str = 'end'
+    NEAREST: str = 'nearest'
 
 
-# TODO: next_version - inherit from Enum
 class ScrollTypes:
-    SMOOTH = 'smooth'
-    INSTANT = 'instant'
+    """ Defines available scroll behaviors. """
+
+    SMOOTH: str = 'smooth'
+    INSTANT: str = 'instant'
 
 
 scroll_into_view_blocks = (ScrollTo.START, ScrollTo.CENTER, ScrollTo.END, ScrollTo.NEAREST)

@@ -14,6 +14,8 @@ def take_locator_type(locator: Any):
 
 @dataclass
 class Locator:
+    """ Represents a WEB UI element locator with platform-specific variations. """
+
     default: Optional[str] = None
     loc_type: Optional[str] = None
     desktop: Optional[str] = None

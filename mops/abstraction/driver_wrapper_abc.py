@@ -102,7 +102,7 @@ class DriverWrapperABC(ABC):
         :param timeout: The time to sleep in seconds (can be an integer or float).
         :type timeout: typing.Union[int, float]
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -114,7 +114,7 @@ class DriverWrapperABC(ABC):
         :type url: str
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -147,7 +147,7 @@ class DriverWrapperABC(ABC):
         """
         Reload the current page.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -155,7 +155,7 @@ class DriverWrapperABC(ABC):
         """
         Navigate forward in the browser.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -163,7 +163,7 @@ class DriverWrapperABC(ABC):
         """
         Navigate backward in the browser.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -175,7 +175,7 @@ class DriverWrapperABC(ABC):
 
         :param cookies: A list of dictionaries, each containing cookie data.
         :type cookies: typing.List[dict]
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -183,7 +183,7 @@ class DriverWrapperABC(ABC):
         """
         Delete all cookies in the current session.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -196,7 +196,7 @@ class DriverWrapperABC(ABC):
 
             Todo: Fixed in playwright 1.43.0
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -215,7 +215,7 @@ class DriverWrapperABC(ABC):
 
         :param frame: The frame element to switch to.
         :type frame: Element
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -223,7 +223,7 @@ class DriverWrapperABC(ABC):
         """
         Switch back to the default content from a frame.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -258,7 +258,7 @@ class DriverWrapperABC(ABC):
 
         :param timeout: The timeout duration to set, in seconds.
         :type timeout: int
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -267,7 +267,7 @@ class DriverWrapperABC(ABC):
         Set the inner window size (viewport) of the current browser context.
 
         :param size: The desired inner window size as a :class:`.Size` object.
-        :return: The current instance of :class:`DriverWrapper`.
+        :return: The current instance of :obj:`.DriverWrapper`.
         """
         raise NotImplementedError()
 
@@ -428,7 +428,7 @@ class DriverWrapperABC(ABC):
         """
         Selenium/Playwright only: Create a new tab and switch to it.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper, now switched to the new tab.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper, now switched to the new tab.
         """
         raise NotImplementedError()
 
@@ -436,7 +436,7 @@ class DriverWrapperABC(ABC):
         """
         Selenium/Playwright only: Switch back to the original tab.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper, now switched to the original tab.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper, now switched to the original tab.
         """
         raise NotImplementedError()
 
@@ -446,7 +446,7 @@ class DriverWrapperABC(ABC):
 
         :param tab: The index of the tab to switch to, starting from 1. Default is the latest tab.
         :type tab: int
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper, now switched to the specified tab.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper, now switched to the specified tab.
         """
         raise NotImplementedError()
 
@@ -454,7 +454,7 @@ class DriverWrapperABC(ABC):
         """
         Selenium/Playwright only: Close all tabs except the original.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper,
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper,
           with all tabs except the original closed.
         """
         raise NotImplementedError()
@@ -469,7 +469,7 @@ class DriverWrapperABC(ABC):
         :type y: int
         :param silent: If :obj:`True`, suppresses the log message. Default is :obj:`False`.
         :type silent: bool
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -527,7 +527,7 @@ class DriverWrapperABC(ABC):
         """
         Appium only: Switch to the native app context.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper, now in the native app context.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper, now in the native app context.
         """
         raise NotImplementedError()
 
@@ -535,7 +535,7 @@ class DriverWrapperABC(ABC):
         """
         Appium only: Switch to the web app context.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper, now in the web app context.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper, now in the web app context.
         """
         raise NotImplementedError()
 
@@ -586,7 +586,7 @@ class DriverWrapperABC(ABC):
         Appium only: Hide the keyboard on a real device.
 
         :param kwargs: Additional arguments passed to the `Keyboard.hide_keyboard` method.
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -622,7 +622,7 @@ class DriverWrapperABC(ABC):
         """
         Appium/Selenium only: Wait for an alert, switch to it, and click accept.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -630,7 +630,7 @@ class DriverWrapperABC(ABC):
         """
         Appium/Selenium only: Wait for an alert, switch to it, and click dismiss.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 

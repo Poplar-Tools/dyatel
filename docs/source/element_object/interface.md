@@ -23,4 +23,5 @@ It provides a comprehensive set of methods that allow you to interact with vario
    :members:
    :undoc-members:
    :inherited-members:
+   :special-members: __init__
 ```

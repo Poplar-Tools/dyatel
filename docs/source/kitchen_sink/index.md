@@ -6,6 +6,10 @@ hidden:
 ---
 
 size
+location
+driver_container
+locator
+scrolls
 ```
 
 ## Overview
@@ -18,4 +22,7 @@ operations, data structures, and utilities.
 
 This section covers features and behaviour of `Group` class detail:
 - {doc}`Size Dataclass <./size>`
-
+- {doc}`Location Dataclass <./location>`
+- {doc}`Driver Dataclass <./driver_container>`
+- {doc}`Locator Dataclass <./locator>`
+- {doc}`Scrolls Constants <./scrolls>`

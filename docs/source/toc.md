@@ -37,7 +37,6 @@ other/locator_object
 ---
 maxdepth: 3
 includehidden:
-caption: Kitchen Sink
 ---
 
 kitchen_sink/index

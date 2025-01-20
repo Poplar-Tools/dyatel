@@ -307,9 +307,9 @@ class CoreElement(ElementABC, ABC):
         """
         Scrolls the element into view using a JavaScript script.
 
-        :param block: The scrolling block alignment. One of the :class:`ScrollTo` options.
+        :param block: The scrolling block alignment. One of the :class:`.ScrollTo` options.
         :type block: ScrollTo
-        :param behavior: The scrolling behavior. One of the :class:`ScrollTypes` options.
+        :param behavior: The scrolling behavior. One of the :class:`.ScrollTypes` options.
         :type behavior: ScrollTypes
         :param sleep: Delay in seconds after scrolling. Can be an integer or a float.
         :type sleep: int or float

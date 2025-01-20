@@ -34,9 +34,9 @@ class DriverWrapperSessions:
     @classmethod
     def add_session(cls, driver_wrapper: DriverWrapper) -> None:
         """
-        Adds a :obj:`DriverWrapper` object to the session pool.
+        Adds a :obj:`.DriverWrapper` object to the session pool.
 
-        :param driver_wrapper: The :obj:`DriverWrapper` instance to add to the pool.
+        :param driver_wrapper: The :obj:`.DriverWrapper` instance to add to the pool.
         :return: None
         """
         cls.all_sessions.append(driver_wrapper)
@@ -44,9 +44,9 @@ class DriverWrapperSessions:
     @classmethod
     def remove_session(cls, driver_wrapper: DriverWrapper) -> None:
         """
-        Removes a :obj:`DriverWrapper` object from the session pool.
+        Removes a :obj:`.DriverWrapper` object from the session pool.
 
-        :param driver_wrapper: The :obj:`DriverWrapper` instance to remove from the pool.
+        :param driver_wrapper: The :obj:`.DriverWrapper` instance to remove from the pool.
         :return: None
         """
         cls.all_sessions.remove(driver_wrapper)
@@ -54,7 +54,7 @@ class DriverWrapperSessions:
     @classmethod
     def sessions_count(cls) -> int:
         """
-        Get the count of initialized :obj:`DriverWrapper` objects.
+        Get the count of initialized :obj:`.DriverWrapper` objects.
 
         :return: :obj:`int` - The number of initialized sessions.
         """
@@ -63,9 +63,9 @@ class DriverWrapperSessions:
     @classmethod
     def first_session(cls) -> Union[DriverWrapper, None]:
         """
-        Get the first :obj:`DriverWrapper` object from the session pool.
+        Get the first :obj:`.DriverWrapper` object from the session pool.
 
-        :return: The first :obj:`DriverWrapper` object in the pool, or `None` if no session exists.
+        :return: The first :obj:`.DriverWrapper` object in the pool, or `None` if no session exists.
         :rtype: typing.Union[DriverWrapper, None]
         """
         return cls.all_sessions[0] if cls.all_sessions else None
@@ -73,16 +73,24 @@ class DriverWrapperSessions:
     @classmethod
     def is_connected(cls) -> bool:
         """
-        Check the connection status of any :obj:`DriverWrapper` object in the pool.
+        Check the connection status of any :obj:`.DriverWrapper` object in the pool.
 
-        :return: :obj:`bool` - :obj:`True` if at least one :obj:`DriverWrapper` object is available,
+        :return: :obj:`bool` - :obj:`True` if at least one :obj:`.DriverWrapper` object is available,
           otherwise :obj:`False`.
         """
         return any(cls.all_sessions)
 
 
 class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
-    """ Driver object crossroad """
+    """
+    A wrapper class for managing web and mobile driver instances,
+    supporting Selenium, Appium, and Playwright.
+
+    This class serves as a crossroad for interacting with different driver types,
+    allowing for flexible management of web and mobile sessions.
+
+    It also provides platform-specific flags and information to assist with automation tasks.
+    """
 
     driver: Union[SeleniumDriver, AppiumDriver, PlaywrightDriver]
     context: PlaywrightContext
@@ -139,9 +147,14 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
     def __init__(self, driver: Driver):
         """
-        Initializing of driver wrapper based on given driver source
+        Initializes the DriverWrapper instance based on the provided driver source.
 
-        :param driver: appium or selenium or playwright driver to initialize
+        This constructor sets up the driver wrapper, which can support
+        Appium, Selenium, or Playwright drivers.
+        It also manages session tracking and platform-specific configurations,
+        such as mobile resolution and platform type.
+
+        :param driver: :obj:`.Driver` object that holds appium / selenium / playwright driver to initialize
         """
         self.__driver_container = driver
         self.session.add_session(self)
