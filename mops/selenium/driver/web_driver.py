@@ -30,7 +30,7 @@ class WebDriver(CoreDriver):
         Set the inner window size (viewport) of the current browser context.
 
         :param size: The desired inner window size as a :class:`.Size` object.
-        :return: The current instance of :class:`WebDriver`.
+        :return: The current instance of :obj:`.WebDriver`.
         """
         outer_width, outer_height = astuple(self.get_window_size())
         inner_width, inner_height = astuple(self.get_inner_window_size())
@@ -54,7 +54,7 @@ class WebDriver(CoreDriver):
         """
         Selenium/Playwright only: Create a new tab and switch to it.
 
-        :return: :obj:`WebDriver` - The current instance of the driver wrapper, now switched to the new tab.
+        :return: :obj:`.WebDriver` - The current instance of the driver wrapper, now switched to the new tab.
         """
         self.driver.switch_to.new_window('tab')
         return self
@@ -63,7 +63,7 @@ class WebDriver(CoreDriver):
         """
         Selenium/Playwright only: Switch back to the original tab.
 
-        :return: :obj:`WebDriver` - The current instance of the driver wrapper, now switched to the original tab.
+        :return: :obj:`.WebDriver` - The current instance of the driver wrapper, now switched to the original tab.
         """
         self.driver.switch_to.window(self.original_tab)
         return self
@@ -74,7 +74,7 @@ class WebDriver(CoreDriver):
 
         :param tab: The index of the tab to switch to, starting from 1. Default is the latest tab.
         :type tab: int
-        :return: :obj:`WebDriver` - The current instance of the driver wrapper, now switched to the specified tab.
+        :return: :obj:`.WebDriver` - The current instance of the driver wrapper, now switched to the specified tab.
         """
         if tab == -1:
             tab = self.get_all_tabs()[tab]
@@ -88,7 +88,7 @@ class WebDriver(CoreDriver):
         """
         Selenium/Playwright only: Close all tabs except the original.
 
-        :return: :obj:`WebDriver` - The current instance of the driver wrapper,
+        :return: :obj:`.WebDriver` - The current instance of the driver wrapper,
           with all tabs except the original closed.
         """
         tabs = self.get_all_tabs()

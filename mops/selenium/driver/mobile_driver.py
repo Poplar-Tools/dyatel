@@ -104,7 +104,7 @@ class MobileDriver(CoreDriver):
         """
         Appium only: Switch to the native app context.
 
-        :return: :obj:`MobileDriver` - The current instance of the driver wrapper, now in the native app context.
+        :return: :obj:`.MobileDriver` - The current instance of the driver wrapper, now in the native app context.
         """
         self.driver.switch_to.context(self.native_context_name)
         self.__is_native_context = True
@@ -115,7 +115,7 @@ class MobileDriver(CoreDriver):
         """
         Appium only: Switch to the web app context.
 
-        :return: :obj:`MobileDriver` - The current instance of the driver wrapper, now in the web app context.
+        :return: :obj:`.MobileDriver` - The current instance of the driver wrapper, now in the web app context.
         """
         self.driver.switch_to.context(self.web_context_name)
         self.__is_native_context = False
@@ -229,7 +229,7 @@ class MobileDriver(CoreDriver):
         Appium only: Hide the keyboard on a real device.
 
         :param kwargs: Additional arguments passed to the `Keyboard.hide_keyboard` method.
-        :return: :obj:`MobileDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.MobileDriver` - The current instance of the driver wrapper.
         """
         if self.is_real_device:
             self.driver.hide_keyboard(**kwargs)
@@ -251,7 +251,7 @@ class MobileDriver(CoreDriver):
         :type y: int
         :param silent: If :obj:`True`, suppresses the log message. Default is :obj:`False`.
         :type silent: bool
-        :return: :obj:`MobileDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.MobileDriver` - The current instance of the driver wrapper.
         """
         if not silent:
             self.log(f'Tap by given coordinates (x: {x}, y: {y})')

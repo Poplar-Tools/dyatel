@@ -354,7 +354,7 @@ class PlayElement(ElementABC, Logging, ABC):
         :param behavior: The scrolling behavior. One of the :class:`.ScrollTypes` options.
         :type behavior: ScrollTypes
         :param sleep: Delay in seconds after scrolling. Can be an integer or a float.
-        :type sleep: int or float
+        :type sleep: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`PlayElement`

@@ -53,15 +53,11 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
     def __repr__(self):
         return self._repr_builder()
 
-    def __call__(self, *arg, **kwargs):
-        return self
-
     def __init__(
             self,
             locator: Union[Locator, str] = '',
             name: str = '',
-            driver_wrapper: Union[DriverWrapper, Any] = None,
-            **kwargs
+            driver_wrapper: Union[DriverWrapper, Any] = None
     ):
         """
         Initializes a Page based on the current driver.
@@ -75,7 +71,6 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
         :type driver_wrapper: typing.Union[DriverWrapper, typing.Any]
         """
         self._validate_inheritance()
-        self._check_kwargs(kwargs)
 
         self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
         

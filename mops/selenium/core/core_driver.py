@@ -96,7 +96,7 @@ class CoreDriver(Logging, DriverWrapperABC):
         :param timeout: The time to sleep in seconds (can be an integer or float).
         :type timeout: typing.Union[int, float]
 
-        :return: :obj:`CoreDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.CoreDriver` - The current instance of the driver wrapper.
         """
         time.sleep(timeout)
         return self
@@ -109,7 +109,7 @@ class CoreDriver(Logging, DriverWrapperABC):
         :type url: str
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
-        :return: :obj:`CoreDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.CoreDriver` - The current instance of the driver wrapper.
         """
         if not silent:
             self.log(f'Navigating to url {url}')
@@ -172,7 +172,7 @@ class CoreDriver(Logging, DriverWrapperABC):
         """
         Reload the current page.
 
-        :return: :obj:`CoreDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.CoreDriver` - The current instance of the driver wrapper.
         """
         self.log('Reload current page')
         self.driver.refresh()
@@ -182,7 +182,7 @@ class CoreDriver(Logging, DriverWrapperABC):
         """
         Navigate forward in the browser.
 
-        :return: :obj:`CoreDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.CoreDriver` - The current instance of the driver wrapper.
         """
         self.log('Going forward')
         self.driver.forward()
@@ -192,7 +192,7 @@ class CoreDriver(Logging, DriverWrapperABC):
         """
         Navigate backward in the browser.
 
-        :return: :obj:`CoreDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.CoreDriver` - The current instance of the driver wrapper.
         """
         self.log('Going back')
         self.driver.back()
@@ -227,7 +227,7 @@ class CoreDriver(Logging, DriverWrapperABC):
 
         :param cookies: A list of dictionaries, each containing cookie data.
         :type cookies: typing.List[dict]
-        :return: :obj:`CoreDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.CoreDriver` - The current instance of the driver wrapper.
         """
         for cookie in cookies:
             cookie.pop('domain', None)
@@ -243,7 +243,7 @@ class CoreDriver(Logging, DriverWrapperABC):
         """
         Delete all cookies in the current session.
 
-        :return: :obj:`CoreDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.CoreDriver` - The current instance of the driver wrapper.
         """
         self.driver.delete_all_cookies()
         return self
@@ -257,7 +257,7 @@ class CoreDriver(Logging, DriverWrapperABC):
 
             Todo: Fixed in playwright 1.43.0
 
-        :return: :obj:`CoreDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.CoreDriver` - The current instance of the driver wrapper.
         """
         self.driver.delete_cookie(name)
         return self
@@ -277,7 +277,7 @@ class CoreDriver(Logging, DriverWrapperABC):
 
         :param frame: The frame element to switch to.
         :type frame: Element
-        :return: :obj:`CoreDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.CoreDriver` - The current instance of the driver wrapper.
         """
         self.driver.switch_to.frame(frame.element)
         return self
@@ -286,7 +286,7 @@ class CoreDriver(Logging, DriverWrapperABC):
         """
         Switch back to the default content from a frame.
 
-        :return: :obj:`CoreDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.CoreDriver` - The current instance of the driver wrapper.
         """
         self.driver.switch_to.default_content()
         return self
@@ -311,7 +311,7 @@ class CoreDriver(Logging, DriverWrapperABC):
 
         :param timeout: The timeout duration to set, in seconds.
         :type timeout: int
-        :return: :obj:`CoreDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.CoreDriver` - The current instance of the driver wrapper.
         """
         self.driver.set_page_load_timeout(timeout)
         return self
@@ -342,7 +342,7 @@ class CoreDriver(Logging, DriverWrapperABC):
         """
         Appium/Selenium only: Wait for an alert, switch to it, and click accept.
 
-        :return: :obj:`CoreDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.CoreDriver` - The current instance of the driver wrapper.
         """
         self.switch_to_alert().accept()
         self.switch_to_default_content()
@@ -352,7 +352,7 @@ class CoreDriver(Logging, DriverWrapperABC):
         """
         Appium/Selenium only: Wait for an alert, switch to it, and click dismiss.
 
-        :return: :obj:`CoreDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.CoreDriver` - The current instance of the driver wrapper.
         """
         self.switch_to_alert().dismiss()
         self.switch_to_default_content()
@@ -368,7 +368,7 @@ class CoreDriver(Logging, DriverWrapperABC):
         :type y: int
         :param silent: If :obj:`True`, suppresses the log message. Default is :obj:`False`.
         :type silent: bool
-        :return: :obj:`CoreDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.CoreDriver` - The current instance of the driver wrapper.
         """
         if not silent:
             self.log(f'Click by given coordinates (x: {x}, y: {y})')

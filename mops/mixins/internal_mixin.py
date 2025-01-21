@@ -36,11 +36,6 @@ def get_static(cls: Any):
 
 class InternalMixin:
 
-    @staticmethod
-    def _check_kwargs(kwargs):
-        assert all(item in available_kwarg_keys for item in kwargs), \
-            f'The given kwargs is not available. Please provide them according to available keys: {available_kwarg_keys}'
-
     def _safe_setter(self, var: str, value: Any):
         if not hasattr(self, var):
             setattr(self, var, value)
