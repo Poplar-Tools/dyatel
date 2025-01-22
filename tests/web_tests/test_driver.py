@@ -38,6 +38,10 @@ def test_driver_cookies(driver_wrapper, mouse_event_page):
     assert all((actual_cookies_after_set, not actual_cookies_after_clear))
 
 
+def test_driver_delete_cookie(driver_wrapper):
+    pass
+
+
 def test_driver_execute_script_set_and_get(driver_wrapper, mouse_event_page):
     driver_wrapper.execute_script('sessionStorage.setItem("foo", "bar")')
     assert driver_wrapper.execute_script('return sessionStorage.getItem("foo")') == 'bar'
