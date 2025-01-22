@@ -39,6 +39,7 @@ def test_driver_cookies(driver_wrapper, mouse_event_page):
 
 
 def test_driver_delete_cookie(driver_wrapper):
+
     pass
 
 
