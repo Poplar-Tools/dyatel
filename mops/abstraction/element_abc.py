@@ -6,7 +6,7 @@ from typing import Union, Any, List, Tuple, Optional, TYPE_CHECKING
 from PIL.Image import Image
 from appium.webdriver.extensions.location import Location
 
-from mops.mixins.objects.cut_box import CutBox
+from mops.mixins.objects.box import Box
 from mops.mixins.objects.scrolls import ScrollTo, ScrollTypes
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 from appium.webdriver.webelement import WebElement as AppiumWebElement
@@ -771,7 +771,7 @@ class ElementABC(MixinABC, ABC):
             scroll: bool = False,
             remove: Union[Element, List[Element]] = None,
             fill_background: Union[str, bool] = False,
-            cut_box: CutBox = None,
+            cut_box: Box = None,
             hide: Union[Element, List[Element]] = None,
     ) -> None:
         """
@@ -800,9 +800,9 @@ class ElementABC(MixinABC, ABC):
         :param fill_background: The color to fill the background.
           If :obj:`True`, uses a default color (black). If a :class:`str`, uses the specified color.
         :type fill_background: typing.Optional[str or bool]
-        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+        :param cut_box: A :class:`.Box` specifying a region to cut from the screenshot.
             If :obj:`None`, no region is cut.
-        :type cut_box: typing.Optional[CutBox]
+        :type cut_box: typing.Optional[Box]
         :param hide: :class:`Element` to hide in the screenshot.
           Can be a single element or a list of elements.
         :type hide: typing.Optional[Element or typing.List[Element]]
@@ -820,7 +820,7 @@ class ElementABC(MixinABC, ABC):
             scroll: bool = False,
             remove: Union[Element, List[Element]] = None,
             fill_background: Union[str, bool] = False,
-            cut_box: CutBox = None,
+            cut_box: Box = None,
             hide: Union[Element, List[Element]] = None,
     ) -> Tuple[bool, str]:
         """
@@ -848,9 +848,9 @@ class ElementABC(MixinABC, ABC):
         :param fill_background: The color to fill the background.
           If :obj:`True`, uses a default color (black). If a :class:`str`, uses the specified color.
         :type fill_background: typing.Optional[str or bool]
-        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+        :param cut_box: A :class:`.Box` specifying a region to cut from the screenshot.
             If :obj:`None`, no region is cut.
-        :type cut_box: typing.Optional[CutBox]
+        :type cut_box: typing.Optional[Box]
         :param hide: :class:`Element` to hide in the screenshot.
           Can be a single element or a list of elements.
         :return: :class:`typing.Tuple` (:class:`bool`, :class:`str`) - result state and result message

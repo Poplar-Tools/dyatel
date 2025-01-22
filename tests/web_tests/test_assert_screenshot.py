@@ -4,7 +4,7 @@ import pytest
 import pytest_rerunfailures
 from mops.exceptions import UnexpectedElementsCountException
 
-from mops.mixins.objects.cut_box import CutBox
+from mops.mixins.objects.box import Box
 from mops.visual_comparison import VisualComparison
 from tests.adata.pages.playground_main_page import Card
 
@@ -30,7 +30,7 @@ def test_screenshot(base_playground_page, driver_name, platform, with_name):
 @pytest.mark.parametrize('is_percent', [True, False], ids=['percent value', 'digit value'])
 def test_screenshot_with_box(base_playground_page, driver_name, platform, left, top, right, bottom, is_percent):
     """ Task: 16053068 """
-    custom_box = CutBox(left, top, right, bottom, is_percents=is_percent)
+    custom_box = Box(left, top, right, bottom, is_percents=is_percent)
     if any([left, top, right, bottom]):
         base_playground_page.kube.scroll_into_view().assert_screenshot(cut_box=custom_box)
 

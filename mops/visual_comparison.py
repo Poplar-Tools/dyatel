@@ -8,9 +8,12 @@ import math
 import json
 import base64
 import importlib
+from dataclasses import astuple
 from urllib.parse import urljoin
 from typing import Union, List, Any, Tuple, Optional
 from string import punctuation
+
+from mops.mixins.objects.size import Size
 
 try:
     import cv2.cv2 as cv2  # ~cv2@4.5.5.62 + python@3.8/9/10
@@ -23,7 +26,7 @@ from PIL import Image
 
 from mops.exceptions import DriverWrapperException, TimeoutException
 from mops.js_scripts import add_element_over_js, delete_element_over_js
-from mops.mixins.objects.cut_box import CutBox
+from mops.mixins.objects.box import Box
 from mops.utils.logs import autolog
 from mops.mixins.internal_mixin import get_element_info
 
@@ -79,7 +82,7 @@ class VisualComparison:
             delay: Union[int, float],
             remove: list,
             fill_background: bool,
-            cut_box: Optional[CutBox],
+            cut_box: Optional[Box],
     ):
         time.sleep(delay)
 
@@ -93,7 +96,8 @@ class VisualComparison:
         image = desired_obj.screenshot_image()
 
         if cut_box:
-            image = image.crop(cut_box.get_box(image.size))
+            image_size = Size(*image.size)
+            image = image.crop(astuple(cut_box.get_image_cut_box(image_size)))
 
         desired_obj.save_screenshot(screenshot_name, screenshot_base=image)
 
@@ -109,7 +113,7 @@ class VisualComparison:
             scroll: bool,
             remove: List[Any],
             fill_background: Union[str, bool],
-            cut_box: Optional[CutBox]
+            cut_box: Optional[Box]
     ) -> VisualComparison:
         """
         Assert given (by name) and taken screenshot equals

@@ -11,7 +11,7 @@ from playwright.sync_api import (
     BrowserContext as PlaywrightContext,
 )
 
-from mops.mixins.objects.cut_box import CutBox
+from mops.mixins.objects.box import Box
 from mops.mixins.objects.driver import Driver
 from mops.visual_comparison import VisualComparison
 from mops.abstraction.driver_wrapper_abc import DriverWrapperABC
@@ -228,7 +228,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             threshold: Union[int, float] = None,
             delay: Union[int, float] = None,
             remove: Union[Element, List[Element]] = None,
-            cut_box: CutBox = None,
+            cut_box: Box = None,
             hide: Union[Element, List[Element]] = None,
     ) -> None:
         """
@@ -252,9 +252,9 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         :param remove: :class:`Element` to remove from the screenshot.
           Can be a single element or a list of elements.
         :type remove: typing.Optional[Element or typing.List[Element]]
-        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+        :param cut_box: A :class:`.Box` specifying a region to cut from the screenshot.
             If :obj:`None`, no region is cut.
-        :type cut_box: typing.Optional[CutBox]
+        :type cut_box: typing.Optional[Box]
         :param hide: :class:`Element` to hide in the screenshot.
           Can be a single element or a list of elements.
         :type hide: typing.Optional[Element or typing.List[Element]]
@@ -282,7 +282,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             threshold: Union[int, float] = None,
             delay: Union[int, float] = None,
             remove: Union[Element, List[Element]] = None,
-            cut_box: CutBox = None,
+            cut_box: Box = None,
             hide: Union[Element, List[Element]] = None,
     ) -> Tuple[bool, str]:
         """
@@ -305,9 +305,9 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         :type delay: typing.Optional[int or float]
         :param remove: :class:`Element` to remove from the screenshot.
         :type remove: typing.Optional[Element or typing.List[Element]]
-        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+        :param cut_box: A :class:`.Box` specifying a region to cut from the screenshot.
             If :obj:`None`, no region is cut.
-        :type cut_box: typing.Optional[CutBox]
+        :type cut_box: typing.Optional[Box]
         :param hide: :class:`Element` to hide in the screenshot.
           Can be a single element or a list of elements.
         :return: :class:`typing.Tuple` (:class:`bool`, :class:`str`) - result state and result message

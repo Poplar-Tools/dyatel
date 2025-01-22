@@ -19,7 +19,7 @@ from mops.selenium.elements.mobile_element import MobileElement
 from mops.selenium.elements.web_element import WebElement
 from mops.mixins.driver_mixin import get_driver_wrapper_from_object, DriverMixin
 from mops.mixins.internal_mixin import InternalMixin, get_element_info
-from mops.mixins.objects.cut_box import CutBox
+from mops.mixins.objects.box import Box
 from mops.mixins.objects.locator import Locator
 from mops.mixins.objects.size import Size
 from mops.utils.logs import Logging, LogLevel
@@ -623,7 +623,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             scroll: bool = False,
             remove: Union[Element, List[Element]] = None,
             fill_background: Union[str, bool] = False,
-            cut_box: CutBox = None,
+            cut_box: Box = None,
             hide: Union[Element, List[Element]] = None,
     ) -> None:
         """
@@ -652,9 +652,9 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param fill_background: The color to fill the background.
           If :obj:`True`, uses a default color (black). If a :class:`str`, uses the specified color.
         :type fill_background: typing.Optional[str or bool]
-        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+        :param cut_box: A :class:`.Box` specifying a region to cut from the screenshot.
             If :obj:`None`, no region is cut.
-        :type cut_box: typing.Optional[CutBox]
+        :type cut_box: typing.Optional[Box]
         :param hide: :class:`Element` to hide in the screenshot.
           Can be a single element or a list of elements.
         :type hide: typing.Optional[Element or typing.List[Element]]
@@ -684,7 +684,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             scroll: bool = False,
             remove: Union[Element, List[Element]] = None,
             fill_background: Union[str, bool] = False,
-            cut_box: CutBox = None,
+            cut_box: Box = None,
             hide: Union[Element, List[Element]] = None,
     ) -> Tuple[bool, str]:
         """
@@ -712,9 +712,9 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param fill_background: The color to fill the background.
           If :obj:`True`, uses a default color (black). If a :class:`str`, uses the specified color.
         :type fill_background: typing.Optional[str or bool]
-        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+        :param cut_box: A :class:`.Box` specifying a region to cut from the screenshot.
             If :obj:`None`, no region is cut.
-        :type cut_box: typing.Optional[CutBox]
+        :type cut_box: typing.Optional[Box]
         :param hide: :class:`Element` to hide in the screenshot.
           Can be a single element or a list of elements.
         :return: :class:`typing.Tuple` (:class:`bool`, :class:`str`) - result state and result message
