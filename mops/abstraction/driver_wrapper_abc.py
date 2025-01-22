@@ -189,12 +189,7 @@ class DriverWrapperABC(ABC):
 
     def delete_cookie(self, name: str) -> DriverWrapper:
         """
-        Appium/Selenium only: Delete a cookie by name.
-
-        Note: Playwright does not support deleting specific cookies:
-            https://github.com/microsoft/playwright/issues/10143
-
-            Todo: Fixed in playwright 1.43.0
+        Delete a cookie by name
 
         :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """

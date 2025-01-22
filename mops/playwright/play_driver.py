@@ -207,6 +207,15 @@ class PlayDriver(Logging, DriverWrapperABC):
         self.context.clear_cookies()
         return self
 
+    def delete_cookie(self, name: str) -> PlayDriver:
+        """
+        Delete a cookie by name.
+
+        :return: :obj:`.PlayDriver` - The current instance of the driver wrapper.
+        """
+        self.context.clear_cookies(name=name)
+        return self
+
     def get_cookies(self) -> List[dict]:
         """
         Retrieve a list of cookie dictionaries corresponding to the cookies visible in the current session.

@@ -230,7 +230,6 @@ class CoreDriver(Logging, DriverWrapperABC):
         :return: :obj:`.CoreDriver` - The current instance of the driver wrapper.
         """
         for cookie in cookies:
-            cookie.pop('domain', None)
 
             if 'path' not in cookie:
                 cookie.update({'path': '/'})
@@ -250,12 +249,7 @@ class CoreDriver(Logging, DriverWrapperABC):
 
     def delete_cookie(self, name: str) -> CoreDriver:
         """
-        Appium/Selenium only: Delete a cookie by name.
-
-        Note: Playwright does not support deleting specific cookies:
-            https://github.com/microsoft/playwright/issues/10143
-
-            Todo: Fixed in playwright 1.43.0
+        Delete a cookie by name.
 
         :return: :obj:`.CoreDriver` - The current instance of the driver wrapper.
         """
