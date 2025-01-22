@@ -30,7 +30,6 @@ caption: Other
 
 other/objects_initialisation
 other/visual_comparison
-other/locator_object
 ```
 
 ```{toctree}

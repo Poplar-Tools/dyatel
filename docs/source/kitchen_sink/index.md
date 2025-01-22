@@ -15,13 +15,13 @@ scrolls
 
 ## Overview
 
-This section documents the essential mini-objects, dataclasses, 
-and helper functions used throughout the framework.
-These building blocks are designed to provide a modular, 
-reusable, and easy-to-understand interface for common 
-operations, data structures, and utilities.
+The **Kitchen Sink** section documents essential mini-objects, dataclasses, 
+and helper functions used throughout the framework. 
+These components serve as modular, reusable, and easy-to-understand building 
+blocks for common operations, data structures, and utilities.
 
-This section covers features and behaviour of `Group` class detail:
+### Available Components
+
 - {doc}`Size Dataclass <./size>`
 - {doc}`Location Dataclass <./location>`
 - {doc}`Driver Dataclass <./driver_container>`
