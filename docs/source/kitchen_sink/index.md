@@ -8,7 +8,7 @@ hidden:
 size
 location
 driver_container
-cut_box
+box
 locator
 scrolls
 ```
@@ -25,6 +25,6 @@ This section covers features and behaviour of `Group` class detail:
 - {doc}`Size Dataclass <./size>`
 - {doc}`Location Dataclass <./location>`
 - {doc}`Driver Dataclass <./driver_container>`
-- {doc}`Box Dataclass <./cut_box>`
+- {doc}`Box Dataclass <./box>`
 - {doc}`Locator Dataclass <./locator>`
 - {doc}`Scrolls Constants <./scrolls>`
