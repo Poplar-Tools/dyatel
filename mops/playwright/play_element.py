@@ -42,7 +42,7 @@ class PlayElement(ElementABC, Logging, ABC):
         :param locator: anchor locator of page. Can be defined without locator_type
         """
         self.locator = get_playwright_locator(get_platform_locator(self))
-        self.locator_type = 'locator_type does not supported for playwright'
+        self.locator_type = None
 
     # Element
 

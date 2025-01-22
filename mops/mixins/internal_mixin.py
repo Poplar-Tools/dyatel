@@ -63,13 +63,13 @@ class InternalMixin:
             parent_class = self.parent.__class__.__name__ if parent else None
             locator_holder = getattr(self, 'anchor', self)
 
-            locator = f'locator="{locator_holder.locator}"'
-            locator_type = f'locator_type="{locator_holder.locator_type}"'
-            name = f'name="{self.name}"'
+            locator = f'locator="{locator_holder.locator}", '
+            locator_type = f'locator_type="{locator_holder.locator_type}", ' if locator_holder.locator_type else ''
+            name = f'name="{self.name}", '
             parent = f'parent={parent_class}'
             driver = f'{self.driver_wrapper.label}={self.driver}'
 
-            base = f'{class_name}({locator}, {locator_type}, {name}, {parent}) at {obj_id}'
+            base = f'{class_name}({locator}{locator_type}{name}{parent}) at {obj_id}'
             additional_info = driver
             return f'{base}, {additional_info}'
         except AttributeError:

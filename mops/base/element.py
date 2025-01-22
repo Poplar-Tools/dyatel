@@ -106,8 +106,10 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         self._validate_inheritance()
 
         if parent:
-            assert isinstance(parent, (bool, Element)), \
-                f'The "parent" of "{self.name}" should take an Element/Group object or False for skip. Get {parent}'
+            if not isinstance(parent, (bool, Element)):
+                error = (f'The given "parent" arg of "{self.name}" should take an Element/Group '
+                         f'object or False for skip. Get {parent}')
+                raise ValueError(error)
 
         self.locator = locator
         self.name = name if name else locator
