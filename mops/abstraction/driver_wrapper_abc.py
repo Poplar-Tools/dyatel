@@ -189,7 +189,7 @@ class DriverWrapperABC(ABC):
 
     def delete_cookie(self, name: str) -> DriverWrapper:
         """
-        Delete a cookie by name
+        Delete a cookie by name.
 
         :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
