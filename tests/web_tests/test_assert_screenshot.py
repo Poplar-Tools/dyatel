@@ -106,32 +106,39 @@ def test_append_dummy_elements_multiple_available(second_playground_page, driver
 
 
 def test_assert_screenshot_hide_elements(colored_blocks_page, driver_wrapper):
+    safe_call(lambda: colored_blocks_page.navbar.wait_elements_count(2), UnexpectedElementsCountException)
     all_cards = colored_blocks_page.get_all_cards()
     colored_blocks_page.row1.assert_screenshot(
         hide=all_cards[1],
         name_suffix='middle hidden',
-        delay=0.5
+        delay=0.5,
+        scroll=True,
     )
     driver_wrapper.refresh()
+
+    safe_call(lambda: colored_blocks_page.navbar.wait_elements_count(2), UnexpectedElementsCountException)
     all_cards = colored_blocks_page.get_all_cards()
     colored_blocks_page.row1.assert_screenshot(
         hide=[all_cards[0], all_cards[2]],
         name_suffix='sides hidden',
-        delay=0.5
+        delay=0.5,
+        scroll=True,
     )
 
 
 def test_assert_screenshot_hide_driver_elements(colored_blocks_page, driver_wrapper):
-    all_cards = colored_blocks_page.get_all_cards()
     safe_call(lambda: colored_blocks_page.navbar.wait_elements_count(2), UnexpectedElementsCountException)
+    all_cards = colored_blocks_page.get_all_cards()
+    all_cards[0].scroll_into_view()
     driver_wrapper.assert_screenshot(
         hide=[all_cards[1]] + colored_blocks_page.navbar.all_elements,
         name_suffix='middle hidden',
         delay=0.5,
     )
     driver_wrapper.refresh()
-    all_cards = colored_blocks_page.get_all_cards()
     safe_call(lambda: colored_blocks_page.navbar.wait_elements_count(2), UnexpectedElementsCountException)
+    all_cards = colored_blocks_page.get_all_cards()
+    all_cards[0].scroll_into_view()
     driver_wrapper.assert_screenshot(
         hide=[all_cards[0], all_cards[2]] + colored_blocks_page.navbar.all_elements,
         name_suffix='sides hidden',
