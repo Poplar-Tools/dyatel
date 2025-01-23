@@ -126,7 +126,7 @@ class PlayDriver(Logging, DriverWrapperABC):
         :return: :obj:`.PlayDriver` - The current instance of the driver wrapper.
         """
         self.log('Reload current page')
-        self.driver.reload()
+        self.driver.reload(wait_until='load')
         return self
 
     def go_forward(self) -> PlayDriver:
