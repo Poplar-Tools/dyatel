@@ -47,7 +47,7 @@ jobs:
         run: |
           WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           git add .
-          git commit -m "Screenshots updated for ${{ github.event.inputs.commit_sha }}\nWorkflow run: $WORKFLOW_URL" || echo "No changes to commit"
+          git commit -m "Screenshots updated for ${{ github.event.inputs.commit_sha }}" -m "Workflow run: $WORKFLOW_URL" || echo "No changes to commit"
 
       - name: Set up Git for authentication
         run: |
@@ -56,15 +56,3 @@ jobs:
       - name: Push changes
         run: |
           git push origin ${{ github.ref }}
-          
-      - name: Retrieve PR URL
-        run: |
-          PR_URL=$(curl -s -H "Authorization: token ${{ secrets.PAT }}" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls?head=${{ github.repository }}:${{ github.ref_name }}&state=open" | \
-            jq -r '.[0].html_url')
-
-          if [ "$PR_URL" != "null" ]; then
-            echo "PR URL: $PR_URL"
-          else
-            echo "No open PR found for this branch."
-          fi
