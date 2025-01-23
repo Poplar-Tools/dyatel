@@ -79,19 +79,20 @@ def test_screenshot_without_reference_and_rerun(base_playground_page, file, requ
 
 
 @pytest.mark.low
-def test_screenshot_soft_assert(colored_blocks_page, request):
+def test_screenshot_soft_assert(colored_blocks_page, request, driver_wrapper):
     options = request.config.option
 
     if options.sgr or options.hgr:
         pytest.skip('Negative check from other test ref')
 
     test_name = test_screenshot_fill_background_default.__name__
-    file = f'{test_name}_first_blocks_row_playwright_chromium.png'
     try:
         check, message = colored_blocks_page.row1.soft_assert_screenshot(test_name=test_name)
         assert not check, message
     finally:
-        os.remove(f'{os.getcwd()}/tests/adata/visual/output/{file}')
+        visual_comparison = VisualComparison(driver_wrapper, colored_blocks_page.row1)
+        file = visual_comparison._get_screenshot_name(test_name)
+        os.remove(f'{os.getcwd()}/tests/adata/visual/output/{file}.png')
 
 
 def test_screenshot_fill_background_blue(colored_blocks_page):
