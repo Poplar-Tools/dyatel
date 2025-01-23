@@ -85,11 +85,13 @@ def test_screenshot_soft_assert(colored_blocks_page, request):
     if options.sgr or options.hgr:
         pytest.skip('Negative check from other test ref')
 
-    check, message = colored_blocks_page.row1.soft_assert_screenshot(
-        test_name=test_screenshot_fill_background_default.__name__
-    )
-
-    assert not check, message
+    test_name = test_screenshot_fill_background_default.__name__
+    file = f'{test_name}_first_blocks_row_playwright_chromium.png'
+    try:
+        check, message = colored_blocks_page.row1.soft_assert_screenshot(test_name=test_name)
+        assert not check, message
+    finally:
+        os.remove(f'{os.getcwd()}/tests/adata/visual/output/{file}')
 
 
 def test_screenshot_fill_background_blue(colored_blocks_page):
@@ -123,26 +125,6 @@ def test_assert_screenshot_hide_elements(colored_blocks_page, driver_wrapper):
         name_suffix='sides hidden',
         delay=0.5,
         scroll=True,
-    )
-
-
-def test_assert_screenshot_hide_driver_elements(colored_blocks_page, driver_wrapper):
-    safe_call(lambda: colored_blocks_page.navbar.wait_elements_count(2), UnexpectedElementsCountException)
-    all_cards = colored_blocks_page.get_all_cards()
-    all_cards[0].scroll_into_view()
-    driver_wrapper.assert_screenshot(
-        hide=[all_cards[1]] + colored_blocks_page.navbar.all_elements,
-        name_suffix='middle hidden',
-        delay=0.5,
-    )
-    driver_wrapper.refresh()
-    safe_call(lambda: colored_blocks_page.navbar.wait_elements_count(2), UnexpectedElementsCountException)
-    all_cards = colored_blocks_page.get_all_cards()
-    all_cards[0].scroll_into_view()
-    driver_wrapper.assert_screenshot(
-        hide=[all_cards[0], all_cards[2]] + colored_blocks_page.navbar.all_elements,
-        name_suffix='sides hidden',
-        delay=0.5,
     )
 
 
@@ -198,3 +180,23 @@ def test_assert_screenshot_negative_missmatch(second_playground_page, driver_wra
         assert f"Visual mismatch found for '{filename}'" in str(exc)
     else:
         raise Exception('Unexpected behavior')
+
+
+def test_assert_screenshot_hide_driver_elements(colored_blocks_page, driver_wrapper):
+    safe_call(lambda: colored_blocks_page.navbar.wait_elements_count(2), UnexpectedElementsCountException)
+    all_cards = colored_blocks_page.get_all_cards()
+    all_cards[0].scroll_into_view()
+    driver_wrapper.assert_screenshot(
+        hide=[all_cards[1]] + colored_blocks_page.navbar.all_elements,
+        name_suffix='middle hidden',
+        delay=0.5,
+    )
+    driver_wrapper.refresh()
+    safe_call(lambda: colored_blocks_page.navbar.wait_elements_count(2), UnexpectedElementsCountException)
+    all_cards = colored_blocks_page.get_all_cards()
+    all_cards[0].scroll_into_view()
+    driver_wrapper.assert_screenshot(
+        hide=[all_cards[0], all_cards[2]] + colored_blocks_page.navbar.all_elements,
+        name_suffix='sides hidden',
+        delay=0.5,
+    )
