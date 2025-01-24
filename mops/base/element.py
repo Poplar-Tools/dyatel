@@ -497,7 +497,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
 
     @property
-    def all_elements(self) -> List[Element]:
+    def all_elements(self) -> Union[List[Element], List[Any]]:
         """
         Returns a list of all matching elements.
 

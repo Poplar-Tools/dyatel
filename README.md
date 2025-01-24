@@ -50,7 +50,6 @@ process, giving you the flexibility and power to automate complex testing scenar
 ## Installation and usage
 For information on installation and usage, please refer to our **[ReadTheDocs documentation](https://mops.readthedocs.io)**. Check it out for more details.
 
-
 ## Contributing
 
 Mops is an open-source project, and we welcome contributions from the community. If you'd like to contribute, please open an pull request from your fork

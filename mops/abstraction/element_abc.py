@@ -52,7 +52,7 @@ class ElementABC(MixinABC, ABC):
         raise NotImplementedError()
 
     @property
-    def all_elements(self) -> Union[list, List[Element]]:
+    def all_elements(self) -> Union[List[Element], List[Any]]:
         """
         Returns a list of all matching elements.
 

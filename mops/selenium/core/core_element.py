@@ -65,7 +65,7 @@ class CoreElement(ElementABC, ABC):
         self._element = base_element
 
     @property
-    def all_elements(self) -> Union[None, List[Any]]:
+    def all_elements(self) -> Union[List[CoreElement], List[Any]]:
         """
         Returns a list of all matching elements.
 
