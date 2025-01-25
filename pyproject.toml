@@ -73,7 +73,7 @@ Tracker = "https://github.com/CustomEnv/mops/issues"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["mops**"]
-exclude = ["tests", "docs", ".github"]
+exclude = ["tests", "docs", "artifacts", ".github", ".venv"]
 
 [tool.setuptools.dynamic]
 version = { attr = "mops.__version__" }

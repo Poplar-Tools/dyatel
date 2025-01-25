@@ -152,7 +152,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             raise DriverWrapperException(f'Cant specify {self.__class__.__name__}')
 
         self._set_static(self._base_cls)
-        self._base_cls.__init__(self, locator=self.locator)
+        self._base_cls.__init__(self)
         self._initialized = True
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using internal methods

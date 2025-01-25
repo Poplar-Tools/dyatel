@@ -16,19 +16,24 @@ all_locator_types = get_child_elements(AppiumBy, str)
 available_kwarg_keys = ('desktop', 'mobile', 'ios', 'android')
 
 
-def get_element_info(element: Any) -> str:
+def get_element_info(element: Any, is_for_container: bool = False) -> str:
     """
     Get element selector information with parent object selector if it exists
 
     :param element: element to collect log data
+    :param is_for_container: element to collect log data
     :return: log string
     """
+    label = '' if is_for_container else 'Selector: '
+
+    selector = f"{label}'{element.log_locator}'"
+
     parent = element.parent
-    current_data = f'Selector: ["{element.locator_type}": "{element.locator}"]'
     if parent:
-        parent_data = f'Parent selector: ["{parent.locator_type}": "{parent.locator}"]'
-        current_data = f'{current_data}. {parent_data}'
-    return current_data
+        container_data = get_element_info(parent, is_for_container=True)
+        selector = f"{selector} <= {container_data}"
+
+    return selector
 
 @lru_cache(maxsize=16)
 def get_static(cls: Any):
@@ -63,13 +68,12 @@ class InternalMixin:
             parent_class = self.parent.__class__.__name__ if parent else None
             locator_holder = getattr(self, 'anchor', self)
 
-            locator = f'locator="{locator_holder.locator}", '
-            locator_type = f'locator_type="{locator_holder.locator_type}", ' if locator_holder.locator_type else ''
+            locator = f'locator="{locator_holder.log_locator}", '
             name = f'name="{self.name}", '
             parent = f'parent={parent_class}'
             driver = f'{self.driver_wrapper.label}={self.driver}'
 
-            base = f'{class_name}({locator}{locator_type}{name}{parent}) at {obj_id}'
+            base = f'{class_name}({locator}{name}{parent}) at {obj_id}'
             additional_info = driver
             return f'{base}, {additional_info}'
         except AttributeError:

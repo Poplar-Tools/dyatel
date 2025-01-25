@@ -13,7 +13,7 @@ from playwright.sync_api import Locator, Page, Browser, BrowserContext
 
 from mops.mixins.objects.size import Size
 from mops.mixins.objects.location import Location
-from mops.utils.selector_synchronizer import get_platform_locator, get_playwright_locator
+from mops.utils.selector_synchronizer import get_platform_locator, set_playwright_locator
 from mops.abstraction.element_abc import ElementABC
 from mops.exceptions import TimeoutException
 from mops.utils.logs import Logging
@@ -35,14 +35,12 @@ class PlayElement(ElementABC, Logging, ABC):
     parent: Union[ElementABC, PlayElement]
     _element: Locator = None
 
-    def __init__(self, locator: str):  # noqa
+    def __init__(self):  # noqa
         """
         Initializing of web element with playwright driver
-
-        :param locator: anchor locator of page. Can be defined without locator_type
         """
-        self.locator = get_playwright_locator(get_platform_locator(self))
-        self.locator_type = None
+        self.locator = get_platform_locator(self)
+        set_playwright_locator(self)
 
     # Element
 

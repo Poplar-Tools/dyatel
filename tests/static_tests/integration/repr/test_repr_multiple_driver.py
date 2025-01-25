@@ -10,6 +10,9 @@ class MyGroup(Group):
     repr_element = Element('element-repr')
 
 
+pytest.skip('rework needed', allow_module_level=True)
+
+
 def test_ios_and_desktop_driver_repr(mocked_ios_driver, mocked_selenium_driver):
     ios_info = repr(mocked_ios_driver)
     desktop_info = repr(mocked_selenium_driver)

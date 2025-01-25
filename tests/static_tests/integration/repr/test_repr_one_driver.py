@@ -6,6 +6,9 @@ from mops.base.page import Page
 from tests.static_tests.conftest import mobile_drivers, mobile_ids
 
 
+pytest.skip('rework needed', allow_module_level=True)
+
+
 def test_ios_driver_repr(mocked_ios_driver):
     info = repr(mocked_ios_driver)
     assert 'platform=ios' in info

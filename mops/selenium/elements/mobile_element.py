@@ -2,29 +2,25 @@ from __future__ import annotations
 
 import time
 from abc import ABC
-from typing import Union
 
 from PIL.Image import Image
 
 from mops.selenium.core.core_element import CoreElement
 from mops.mixins.objects.location import Location
-from mops.mixins.objects.locator import Locator, take_locator_type
 from mops.mixins.objects.size import Size
 from mops.utils.internal_utils import calculate_coordinate_to_click
-from mops.utils.selector_synchronizer import get_platform_locator, get_selenium_locator_type, get_appium_selector
+from mops.utils.selector_synchronizer import get_platform_locator, set_selenium_selector, set_appium_selector
 
 
 class MobileElement(CoreElement, ABC):
 
-    def __init__(self, locator: Union[Locator, str]):
+    def __init__(self):
         """
         Initializing of mobile element with appium driver
-
-        :param locator: anchor locator of page. Can be defined without locator_type
         """
         self.locator = get_platform_locator(self)
-        locator_type = take_locator_type(locator) or get_selenium_locator_type(self.locator)
-        self.locator, self.locator_type = get_appium_selector(self.locator, locator_type)
+        set_selenium_selector(self)
+        set_appium_selector(self)
 
     def click_outside(self, x: int = -5, y: int = -5) -> MobileElement:
         """
