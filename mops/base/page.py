@@ -77,6 +77,7 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
         self.anchor = Element(locator, name=name, driver_wrapper=self.driver_wrapper)
         self.locator = self.anchor.locator
         self.locator_type = self.anchor.locator_type
+        self.log_locator = self.anchor.log_locator
         self.name = self.anchor.name
 
         self.url = getattr(self, 'url', '')
