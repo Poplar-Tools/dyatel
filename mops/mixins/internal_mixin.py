@@ -16,24 +16,21 @@ all_locator_types = get_child_elements(AppiumBy, str)
 available_kwarg_keys = ('desktop', 'mobile', 'ios', 'android')
 
 
-def get_element_info(element: Any, is_for_container: bool = False) -> str:
+def get_element_info(element: Any, _is_initial_call: bool = True) -> str:
     """
     Get element selector information with parent object selector if it exists
 
     :param element: element to collect log data
-    :param is_for_container: element to collect log data
+    :param _is_initial_call: element to collect log data
     :return: log string
     """
-    label = '' if is_for_container else 'Selector: '
-
-    selector = f"{label}'{element.log_locator}'"
-
+    selector = element.log_locator
     parent = element.parent
-    if parent:
-        container_data = get_element_info(parent, is_for_container=True)
-        selector = f"{selector} <= {container_data}"
 
-    return selector
+    if parent:
+        selector = f"{get_element_info(parent, _is_initial_call=False)} >> {selector}"
+
+    return f"Selector='{selector}'" if _is_initial_call else selector
 
 @lru_cache(maxsize=16)
 def get_static(cls: Any):

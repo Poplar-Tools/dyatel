@@ -3,7 +3,7 @@ import pytest
 from mops.exceptions import *
 from mops.mixins.objects.size import Size
 
-timeout = 0.5
+timeout = 0.1
 
 
 @pytest.mark.medium
@@ -37,7 +37,7 @@ def test_wait_element_disabled_error_msg(forms_page):
         forms_page.validation_form.wait_disabled(timeout=timeout)
     except TimeoutException as exc:
         assert f'"Validation form" is not disabled after {timeout} seconds.' in exc.msg
-        assert 'Selector:' in exc.msg
+        assert """Selector='xpath=//*[contains(@class, "card") and .//.="Form with Validations"]""" in exc.msg
     else:
         raise Exception('Unexpected behaviour')
 
@@ -48,8 +48,7 @@ def test_wait_element_enabled_error_msg(forms_page):
         forms_page.controls_form.salary_input.wait_enabled(timeout=timeout)
     except TimeoutException as exc:
         assert f'"salary input" is not enabled after {timeout} seconds. ' in exc.msg
-        assert 'Selector:' in exc.msg
-        assert 'Parent selector:' in exc.msg
+        assert """Selector='xpath=//*[contains(@class, "card") and .//.="Basic Form Controls"] >> id=salary'""" in exc.msg
     else:
         raise Exception('Unexpected behaviour')
 
@@ -102,8 +101,7 @@ def test_wait_element_visible_error_msg(forms_page):
         forms_page.controls_form.broken_input.wait_visibility(timeout=timeout)
     except TimeoutException as exc:
         assert f'"invalid element" not visible after {timeout} seconds.' in exc.msg
-        assert 'Selector:' in exc.msg
-        assert 'Parent selector:' in exc.msg
+        assert """Selector='xpath=//*[contains(@class, "card") and .//.="Basic Form Controls"] >> id=data'""" in exc.msg
     else:
         raise Exception('Unexpected behaviour')
 
@@ -114,8 +112,7 @@ def test_wait_element_hidden_error_msg(forms_page):
         forms_page.controls_form.salary_input.wait_hidden(timeout=timeout)
     except TimeoutException as exc:
         assert f'"salary input" still visible after {timeout} seconds.' in exc.msg
-        assert 'Selector:' in exc.msg
-        assert 'Parent selector:' in exc.msg
+        assert """Selector='xpath=//*[contains(@class, "card") and .//.="Basic Form Controls"] >> id=salary""" in exc.msg
     else:
         raise Exception('Unexpected behaviour')
 
@@ -126,7 +123,6 @@ def test_wait_element_available_error_msg(forms_page):
         forms_page.controls_form.broken_input.wait_availability(timeout=timeout)
     except TimeoutException as exc:
         assert f'"invalid element" not available in DOM after {timeout} seconds.' in exc.msg
-        assert 'Selector:' in exc.msg
-        assert 'Parent selector:' in exc.msg
+        assert """Selector='xpath=//*[contains(@class, "card") and .//.="Basic Form Controls"] >> id=data""" in exc.msg
     else:
         raise Exception('Unexpected behaviour')

@@ -27,46 +27,46 @@ class AnotherGroup(Group):
 
 def test_get_element_info_selenium(mocked_selenium_driver):
     el = Element('element')
-    assert "Selector: 'id=element'" in get_element_info(el)
+    assert "Selector='id=element'" in get_element_info(el)
 
 
 def test_get_element_info_with_parent_selenium(mocked_selenium_driver):
     el = SomeGroup().another_group.el
-    assert "Selector: 'id=another_element' <= 'id=another_group' <= 'id=group'" in get_element_info(el)
+    assert "Selector='id=group >> id=another_group >> id=another_element'" in get_element_info(el)
 
 def test_get_element_info_playwright(mocked_play_driver):
     el = Element('element')
-    assert "Selector: 'id=element'" in get_element_info(el)
+    assert "Selector='id=element'" in get_element_info(el)
 
 
 def test_get_element_info_with_parent_playwright(mocked_play_driver):
     el = SomeGroup().another_group.el
-    assert "Selector: 'id=another_element' <= 'id=another_group' <= 'id=group'" in get_element_info(el)
+    assert "Selector='id=group >> id=another_group >> id=another_element'" in get_element_info(el)
 
 
 def test_get_element_info_with_ios(mocked_ios_driver):
     el = SomeGroup().mel
-    assert "Selector: 'id=ielement' <= 'id=gielement'" in get_element_info(el)
+    assert "Selector='id=gielement >> id=ielement'" in get_element_info(el)
 
 
 def test_get_element_info_with_android(mocked_android_driver):
     el = SomeGroup().mel
-    assert "Selector: 'id=aelement' <= 'id=gaelement" in get_element_info(el)
+    assert "Selector='id=gaelement >> id=aelement'" in get_element_info(el)
 
 
 def test_get_element_info_with_parent_ios(mocked_ios_driver):
     el = SomeGroup().another_group.el
-    assert "Selector: 'css=.another_i_element' <= 'id=another_group' <= 'id=gielement'" in get_element_info(el)
+    assert "Selector='id=gielement >> id=another_group >> css=.another_i_element" in get_element_info(el)
 
 
 def test_get_element_info_with_parent_android(mocked_android_driver):
     el = SomeGroup().another_group.el
-    assert "Selector: 'css=.another_a_element' <= 'id=another_group' <= 'id=gaelement'" in get_element_info(el)
+    assert "Selector='id=gaelement >> id=another_group >> css=.another_a_element" in get_element_info(el)
 
 
 def test_get_element_info_with_mobile_and_desktop(mocked_android_driver, mocked_selenium_driver):
     mobile_element = SomeGroup(driver_wrapper=mocked_android_driver).mel
-    assert "Selector: 'id=aelement' <= 'id=gaelement'" in get_element_info(mobile_element)
+    assert "Selector='id=gaelement >> id=aelement'" in get_element_info(mobile_element)
 
     desktop_element = SomeGroup(driver_wrapper=mocked_selenium_driver).mel
-    assert "Selector: 'id=delement' <= 'id=group'" in get_element_info(desktop_element)
+    assert "Selector='id=group >> id=delement'" in get_element_info(desktop_element)
