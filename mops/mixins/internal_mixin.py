@@ -8,6 +8,7 @@ from appium.webdriver.common.appiumby import AppiumBy
 from mops.utils.internal_utils import (
     get_child_elements_with_names,
     get_child_elements,
+    get_attributes_from_object,
 )
 
 
@@ -31,9 +32,13 @@ def get_element_info(element: Any, _is_initial_call: bool = True) -> str:
 
     return f"Selector='{selector}'" if _is_initial_call else selector
 
-@lru_cache(maxsize=32)
-def get_static(cls: Any) -> dict:
+@lru_cache(maxsize=16)
+def get_static_with_bases(cls: Any) -> dict:
     return get_child_elements_with_names(cls)
+
+@lru_cache(maxsize=16)
+def get_static_without_bases(cls: Any) -> dict:
+    return get_attributes_from_object(cls)
 
 class InternalMixin:
 
@@ -50,8 +55,8 @@ class InternalMixin:
         :return: None
         """
         data = {
-            name: value for name, value in get_static(cls).items()
-            if name not in get_static(self.__class__)
+            name: value for name, value in get_static_with_bases(cls).items()
+            if name not in get_static_without_bases(self.__class__)
         }.items()
 
         for name, item in data:
