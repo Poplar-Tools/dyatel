@@ -65,10 +65,6 @@ def get_timeout_in_ms(timeout: Union[int, float]):
     return validate_timeout(timeout) * 1000
 
 
-def safe_getattribute(obj, item):
-    return object.__getattribute__(obj, item)
-
-
 def get_frame(frame=1):
     """
     Get frame by given id
