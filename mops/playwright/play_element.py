@@ -15,7 +15,7 @@ from mops.mixins.objects.size import Size
 from mops.mixins.objects.location import Location
 from mops.utils.selector_synchronizer import get_platform_locator, set_playwright_locator
 from mops.abstraction.element_abc import ElementABC
-from mops.exceptions import TimeoutException
+from mops.exceptions import TimeoutException, NotInitializedException
 from mops.utils.logs import Logging
 from mops.shared_utils import cut_log_data, get_image
 from mops.utils.internal_utils import (
@@ -33,6 +33,8 @@ class PlayElement(ElementABC, Logging, ABC):
     context: BrowserContext
     driver: Page
     parent: Union[ElementABC, PlayElement]
+
+    _initialized: bool
     _element: Locator = None
 
     def __init__(self):  # noqa
@@ -53,6 +55,12 @@ class PlayElement(ElementABC, Logging, ABC):
         :param: kwargs: kwargs from Locator object
         :return: Locator
         """
+        if not self._initialized:
+            raise NotInitializedException(
+                f'{repr(self)} object is not initialized. '
+                'Try to initialize base object first or call it directly as a method'
+            )
+
         element = self._element
         if not element:
             driver = self._get_base()

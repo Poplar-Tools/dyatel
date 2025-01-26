@@ -31,7 +31,6 @@ from mops.utils.internal_utils import (
     is_target_on_screen,
     initialize_objects,
     get_child_elements_with_names,
-    safe_getattribute,
     set_parent_for_attr,
     is_page,
     QUARTER_WAIT_EL,
@@ -67,15 +66,6 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
     def __call__(self, driver_wrapper: DriverWrapper = None):
         self.__full_init__(driver_wrapper=get_driver_wrapper_from_object(driver_wrapper))
         return self
-
-    def __getattribute__(self, item):
-        if item == 'element' and not safe_getattribute(self, '_initialized'):
-            raise NotInitializedException(
-                f'{repr(self)} object is not initialized. '
-                'Try to initialize base object first or call it directly as a method'
-            )
-
-        return safe_getattribute(self, item)
 
     def __init__(
             self,
