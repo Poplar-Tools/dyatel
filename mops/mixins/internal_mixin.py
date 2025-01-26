@@ -36,7 +36,7 @@ def get_element_info(element: Any, _is_initial_call: bool = True) -> str:
 def get_static_with_bases(cls: Any) -> dict:
     return get_child_elements_with_names(cls)
 
-@lru_cache(maxsize=64)
+@lru_cache(maxsize=16)
 def get_static_without_bases(cls: Any) -> dict:
     return get_all_attributes_from_object(cls)
 
