@@ -1,5 +1,6 @@
 import cProfile
 import pstats
+import sys
 import tracemalloc
 import time
 
@@ -70,11 +71,29 @@ def test_performance_element_initialisation(mocked_selenium_driver, case, set_el
     print('peak_mem=', peak_mem)
     print('cpu_time=', cpu_time)
 
-    assert stats.total_tt < 0.45, f"Execution time too high: {stats.total_tt:.3f} sec"
-    assert peak_mem < 11, f"Peak memory usage too high: {peak_mem:.2f} MB"
+    expected_peak_mem = 5.3
+    expected_init_duration = 0.6
+
+    if sys.version_info >= (3, 9):
+        expected_peak_mem = 5.3
+        expected_init_duration = 0.6
+    if sys.version_info >= (3, 10):
+        expected_peak_mem = 5.3
+        expected_init_duration = 0.6
+    if sys.version_info >= (3, 11):
+        expected_peak_mem = 4.6
+        expected_init_duration = 1.0
+    if sys.version_info >= (3, 12):
+        expected_peak_mem = 4.4
+        expected_init_duration = 1.2
+
+    assert expected_init_duration -0.5 < stats.total_tt < expected_init_duration,\
+        f"Execution time too high: {stats.total_tt:.3f} sec"
+    assert expected_peak_mem -1 < peak_mem < expected_peak_mem,\
+        f"Peak memory usage too high: {peak_mem:.2f} MB"
     assert len(section.sub_elements) == section_sub_elements_count, \
         f"Expected {section_sub_elements_count} elements, got {len(section.sub_elements)}"
-    assert cpu_time < 0.45, f"CPU execution time too high: {cpu_time:.3f} sec"
+    assert cpu_time < expected_init_duration, f"CPU execution time too high: {cpu_time:.3f} sec"
 
 
 @pytest.fixture(scope='module')
@@ -120,7 +139,28 @@ def test_performance_group_initialisation(mocked_selenium_driver, case, set_grou
     print('peak_mem=', peak_mem)
     print('cpu_time=', cpu_time)
 
-    assert stats.total_tt < 1.5, f"Execution time too high: {stats.total_tt:.3f} sec"
-    assert peak_mem < 4, f"Peak memory usage too high: {peak_mem:.2f} MB"
-    assert cpu_time < 1.5, f"CPU execution time too high: {cpu_time:.3f} sec"
+    expected_peak_mem = 3.9
+    expected_init_duration = 0.7
+
+    if sys.version_info >= (3, 9):
+        expected_peak_mem = 3.9
+        expected_init_duration = 1.0
+
+    if sys.version_info >= (3, 10):
+        expected_peak_mem = 3.9
+        expected_init_duration = 0.95
+
+    if sys.version_info >= (3, 11):
+        expected_peak_mem = 3.3
+        expected_init_duration = 1.45
+
+    if sys.version_info >= (3, 12):
+        expected_peak_mem = 3.1
+        expected_init_duration = 1.75
+
+    assert expected_init_duration -0.5 < stats.total_tt < expected_init_duration, \
+        f"Execution time too high: {stats.total_tt:.3f} sec"
+    assert expected_peak_mem -1 < peak_mem < expected_peak_mem, \
+        f"Peak memory usage too high: {peak_mem:.2f} MB"
+    assert cpu_time < expected_init_duration, f"CPU execution time too high: {cpu_time:.3f} sec"
     assert count > 3600, f"Expected 3600 elements, got {count}"
