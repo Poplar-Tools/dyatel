@@ -99,46 +99,55 @@ def is_driver_wrapper(obj: Any) -> bool:
     return getattr(obj, '_object', None) == 'driver_wrapper'
 
 
-def initialize_objects(current_object, objects: dict, cls: Any):
+def initialize_objects(current_object, sub_elements: dict, instance_class: Any):
     """
     Copy objects and initializing them with driver_wrapper from current object
 
     :param current_object: list of objects to initialize
-    :param objects: list of objects to initialize
-    :param cls: class of initializing objects
+    :param sub_elements: list of objects to initialize
+    :param instance_class: class of initializing objects
     :return: None
     """
-    for name, obj in objects.items():
+    for name, obj in sub_elements.items():
         copied_obj = copy(obj)
-        promote_parent_element(copied_obj, current_object, cls)
+
+        promote_parent_element(copied_obj, current_object, instance_class)
+        sub_elements[name] = copied_obj
         setattr(current_object, name, copied_obj(driver_wrapper=current_object.driver_wrapper))
-        initialize_objects(copied_obj, get_child_elements_with_names(copied_obj, cls), cls)
+
+        initialize_objects(copied_obj, copied_obj.sub_elements, instance_class)
 
 
-def set_parent_for_attr(base_obj: object, instance_class: Union[type, tuple], with_copy: bool = False):
+def set_parent_for_attr(
+        current_object: object,
+        sub_elements: dict,
+        instance_class: Union[type, tuple],
+        with_copy: bool = False
+):
     """
     Sets parent for all Elements/Group of given class.
     Should be called ONLY in Group object or all_elements method.
     Copy of objects will be executed if with_copy is True. Required for all_elements method
 
     :param instance_class: attribute class to looking for
-    :param base_obj: object of attribute
+    :param sub_elements: list of objects to initialize
+    :param current_object: object of attribute
     :param with_copy: copy child object or not
     :return: self
     """
-    child_elements = get_child_elements_with_names(base_obj, instance_class).items()
 
-    for name, child in child_elements:
+    for name, obj in sub_elements.items():
         if with_copy:
-            child = copy(child)
+            obj = copy(obj)
 
-        if (is_group(base_obj) and child.parent is None) or is_group(child.parent):
-            child.parent = base_obj
+        if (is_group(current_object) and obj.parent is None) or is_group(obj.parent):
+            obj.parent = current_object
 
         if with_copy:
-            setattr(base_obj, name, child)
+            sub_elements[name] = obj
+            setattr(current_object, name, obj)
 
-        set_parent_for_attr(child, instance_class, with_copy)
+        set_parent_for_attr(obj, obj.sub_elements, instance_class, with_copy)
 
 
 def promote_parent_element(obj: Any, base_obj: Any, cls: Any):
@@ -180,7 +189,7 @@ def get_child_elements_with_names(obj: Any, instance: Union[type, tuple] = None)
     elements = {}
 
     for attribute, value in get_all_attributes_from_object(obj).items():
-        if instance and isinstance(value, instance) or not instance:
+        if not instance or isinstance(value, instance):
             if attribute != 'parent' and not attribute.startswith('__') and not attribute.endswith('__'):
                 elements.update({attribute: value})
 

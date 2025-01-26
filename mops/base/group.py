@@ -77,6 +77,6 @@ class Group(Element):
         Initializing of attributes with type == Group/Element.
         Required for classes with base == Group.
         """
-        initialize_objects(self, get_child_elements_with_names(self, Element), Element)
-        set_parent_for_attr(self, Element)
-        self.child_elements: List[Element] = get_child_elements(self, Element)
+        self.sub_elements = get_child_elements_with_names(self, Element)
+        initialize_objects(self, self.sub_elements, Element)
+        set_parent_for_attr(self, self.sub_elements, Element)
