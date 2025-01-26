@@ -72,7 +72,7 @@ class Group(Element):
             driver_wrapper=driver_wrapper,
         )
 
-    def _modify_children(self) -> None:
+    def _modify_sub_elements(self) -> None:
         """
         Initializing of attributes with type == Group/Element.
         Required for classes with base == Group.

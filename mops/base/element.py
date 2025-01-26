@@ -131,7 +131,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
 
         self._modify_object()
-        self._modify_children()
+        self._modify_sub_elements()
 
         if not self._initialized:
             self.__init_base_class__()
@@ -763,13 +763,16 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         return wrapped_elements
 
-    def _modify_children(self):
+    def _modify_sub_elements(self):
         """
         Initializing of attributes with  type == Element.
         Required for classes with base == Element.
         """
-        self.sub_elements = get_child_elements_with_names(self, Element)
-        initialize_objects(self, self.sub_elements, Element)
+        self.sub_elements = {}
+
+        if type(self) is not Element:
+            self.sub_elements = get_child_elements_with_names(self, Element)
+            initialize_objects(self, self.sub_elements, Element)
 
     def _modify_object(self):
         """

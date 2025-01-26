@@ -84,7 +84,7 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
 
         self._init_locals = locals()
         self._modify_page_driver_wrapper(driver_wrapper)
-        self._modify_children()
+        self._modify_sub_elements()
         self._safe_setter('__base_obj_id', id(self))
 
         self.page_elements: List[Element] = get_child_elements(self, Element)
@@ -192,7 +192,7 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
 
         return result
 
-    def _modify_children(self):
+    def _modify_sub_elements(self):
         """
         Initializing of attributes with type == Element.
         Required for classes with base == Page.
