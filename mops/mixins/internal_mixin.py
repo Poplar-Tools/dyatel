@@ -8,7 +8,6 @@ from appium.webdriver.common.appiumby import AppiumBy
 from mops.utils.internal_utils import (
     get_child_elements_with_names,
     get_child_elements,
-    get_attributes_from_object,
 )
 
 
@@ -54,13 +53,14 @@ class InternalMixin:
 
         :return: None
         """
+        current_obj_cls = self.__class__
         data = {
             name: value for name, value in get_static_with_bases(cls).items()
-            if name not in get_static_without_bases(self.__class__)
+            if name not in get_static_without_bases(current_obj_cls)
         }.items()
 
         for name, item in data:
-            setattr(cls, name, item)
+            setattr(current_obj_cls, name, item)
 
     def _repr_builder(self: Any):
         class_name = self.__class__.__name__

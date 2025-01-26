@@ -197,7 +197,8 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
         Initializing of attributes with type == Element.
         Required for classes with base == Page.
         """
-        initialize_objects(self, get_child_elements_with_names(self, Element), Element)
+        self.sub_elements = get_child_elements_with_names(self, Element)
+        initialize_objects(self, self.sub_elements, Element)
 
     def _modify_page_driver_wrapper(self, driver_wrapper: Any):
         """
