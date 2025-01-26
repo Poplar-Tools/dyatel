@@ -31,9 +31,9 @@ def get_element_info(element: Any, _is_initial_call: bool = True) -> str:
 
     return f"Selector='{selector}'" if _is_initial_call else selector
 
-@lru_cache(maxsize=16)
-def get_static(cls: Any):
-    return get_child_elements_with_names(cls).items()
+@lru_cache(maxsize=32)
+def get_static(cls: Any) -> dict:
+    return get_child_elements_with_names(cls)
 
 class InternalMixin:
 
@@ -50,13 +50,12 @@ class InternalMixin:
         :return: None
         """
         data = {
-            name: value for name, value in get_static(cls)
+            name: value for name, value in get_static(cls).items()
+            if name not in get_static(self.__class__)
         }.items()
 
         for name, item in data:
-            cls = self.__class__
-            if name not in cls.__dict__:
-                setattr(cls, name, item)
+            setattr(cls, name, item)
 
     def _repr_builder(self: Any):
         class_name = self.__class__.__name__
