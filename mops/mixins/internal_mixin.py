@@ -8,7 +8,6 @@ from appium.webdriver.common.appiumby import AppiumBy
 from mops.utils.internal_utils import (
     get_child_elements_with_names,
     get_child_elements,
-    get_all_attributes_from_object,
 )
 
 
@@ -56,7 +55,7 @@ class InternalMixin:
 
         for name, item in data:
             cls = self.__class__
-            if not hasattr(cls, name):
+            if name not in cls.__dict__:
                 setattr(cls, name, item)
 
     def _repr_builder(self: Any):
