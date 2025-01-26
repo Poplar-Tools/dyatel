@@ -8,6 +8,7 @@ from appium.webdriver.common.appiumby import AppiumBy
 from mops.utils.internal_utils import (
     get_child_elements_with_names,
     get_child_elements,
+    get_all_attributes_from_object,
 )
 
 
@@ -35,9 +36,9 @@ def get_element_info(element: Any, _is_initial_call: bool = True) -> str:
 def get_static_with_bases(cls: Any) -> dict:
     return get_child_elements_with_names(cls)
 
-@lru_cache(maxsize=16)
+@lru_cache(maxsize=64)
 def get_static_without_bases(cls: Any) -> dict:
-    return cls.__dict__
+    return get_all_attributes_from_object(cls)
 
 class InternalMixin:
 
