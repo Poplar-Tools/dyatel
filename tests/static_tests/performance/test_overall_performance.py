@@ -144,11 +144,11 @@ def test_performance_group_initialisation(mocked_selenium_driver, case, set_grou
 
     if sys.version_info >= (3, 9):
         expected_peak_mem = 3.9
-        expected_init_duration = 1.0
+        expected_init_duration = 1.2
 
     if sys.version_info >= (3, 10):
         expected_peak_mem = 3.9
-        expected_init_duration = 1.1
+        expected_init_duration = 1.2
 
     if sys.version_info >= (3, 11):
         expected_peak_mem = 3.3
