@@ -69,7 +69,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         return self
 
     def __getattribute__(self, item):
-        if 'element' in item and not safe_getattribute(self, '_initialized'):
+        if item == 'element' and not safe_getattribute(self, '_initialized'):
             raise NotInitializedException(
                 f'{repr(self)} object is not initialized. '
                 'Try to initialize base object first or call it directly as a method'
@@ -758,7 +758,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             wrapped_object: Any = copy(self)
             wrapped_object.element = element
             wrapped_object._wrapped = True
-            set_parent_for_attr(wrapped_object, Element, with_copy=True)
+            set_parent_for_attr(wrapped_object, wrapped_object.sub_elements, Element, with_copy=True)
             wrapped_elements.append(wrapped_object)
 
         return wrapped_elements
@@ -768,7 +768,8 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         Initializing of attributes with  type == Element.
         Required for classes with base == Element.
         """
-        initialize_objects(self, get_child_elements_with_names(self, Element), Element)
+        self.sub_elements = get_child_elements_with_names(self, Element)
+        initialize_objects(self, self.sub_elements, Element)
 
     def _modify_object(self):
         """
