@@ -38,6 +38,8 @@ def get_static(cls: Any):
 
 class InternalMixin:
 
+    call = 0
+
     def _safe_setter(self, var: str, value: Any):
         if not hasattr(self, var):
             setattr(self, var, value)
@@ -50,11 +52,12 @@ class InternalMixin:
         """
         data = {
             name: value for name, value in get_static(cls)
-            if name not in get_all_attributes_from_object(self).keys()
         }.items()
 
         for name, item in data:
-            setattr(self.__class__, name, item)
+            cls = self.__class__
+            if not hasattr(cls, name):
+                setattr(cls, name, item)
 
     def _repr_builder(self: Any):
         class_name = self.__class__.__name__
