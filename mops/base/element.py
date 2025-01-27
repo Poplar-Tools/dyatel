@@ -90,7 +90,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         If no driver is available, initialization is skipped and will be handled later in a Page or Group.
 
-        :param locator: The element's locator
+        :param locator: The element's locator. `.LocatorType` is optional.
         :type locator: typing.Union[Locator, str]
         :param name: The name of the element, used for logging and identification purposes.
         :type name: str

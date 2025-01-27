@@ -1,16 +1,17 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
 from typing import Any, Union
 
 from selenium.webdriver.common.by import By
 
 from mops.exceptions import InvalidLocatorException
 from mops.mixins.objects.locator import Locator
+from mops.mixins.objects.locator_type import LocatorType
 from mops.utils.internal_utils import all_tags
 
 
+DEFAULT_MATCH = (f"{LocatorType.XPATH}=", f"{LocatorType.ID}=", f"{LocatorType.CSS}=", f"{LocatorType.TEXT}=")
 XPATH_MATCH = ("/", "./", "(/")
 CSS_MATCH = ("#", ".")
 CSS_REGEXP = r"[#.\[\]=]"
@@ -45,14 +46,6 @@ def get_platform_locator(obj: Any):
         raise InvalidLocatorException(f'Cannot extract locator for current platform for following object: {obj}')
 
     return locator
-
-
-@dataclass
-class LocatorType:
-    CSS = 'css'
-    XPATH = 'xpath'
-    ID = 'id'
-    TEXT = 'text'
 
 
 def set_selenium_selector(obj: Any):
@@ -108,9 +101,6 @@ def set_selenium_selector(obj: Any):
         obj.locator = f'[{LocatorType.ID}="{locator}"]'
         obj.locator_type = By.CSS_SELECTOR
         obj.log_locator = f'{LocatorType.ID}={locator}'
-
-
-DEFAULT_MATCH = (f"{LocatorType.XPATH}=", f"{LocatorType.ID}=", f"{LocatorType.CSS}=", f"{LocatorType.TEXT}=")
 
 
 def set_playwright_locator(obj: Any):

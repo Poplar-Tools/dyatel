@@ -5,11 +5,12 @@
 hidden:
 ---
 
-size
-location
-driver_container
-box
 locator
+locator_type
+driver_container
+size
+box
+location
 scrolls
 ```
 
@@ -22,9 +23,10 @@ blocks for common operations, data structures, and utilities.
 
 ### Available Components
 
-- {doc}`Size Dataclass <./size>`
-- {doc}`Location Dataclass <./location>`
-- {doc}`Driver Dataclass <./driver_container>`
-- {doc}`Box Dataclass <./box>`
 - {doc}`Locator Dataclass <./locator>`
+- {doc}`Locator Type Constants <./locator_type>`
+- {doc}`Driver Dataclass <./driver_container>`
+- {doc}`Size Dataclass <./size>`
+- {doc}`Box Dataclass <./box>`
+- {doc}`Location Dataclass <./location>`
 - {doc}`Scrolls Constants <./scrolls>`

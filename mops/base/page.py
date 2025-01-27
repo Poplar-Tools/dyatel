@@ -62,7 +62,7 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
         """
         Initializes a Page based on the current driver.
 
-        :param locator: The anchor locator of the page
+        :param locator: The anchor locator of the page. `.LocatorType` is optional.
         :type locator: typing.Union[Locator, str]
         :param name: The name of the page, used for logging and identification purposes.
         :type name: str

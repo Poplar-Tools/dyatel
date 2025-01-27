@@ -50,7 +50,7 @@ class Group(Element):
          with specific methods to manage child elements, locator handling, and initialization
          with respect to the driver.
 
-        :param locator: The anchor locator for the group
+        :param locator: The anchor locator for the group. `.LocatorType` is optional.
         :type locator: typing.Union[Locator, str]
         :param name: The name of the group, used for logging and identification purposes.
         :type name: str
