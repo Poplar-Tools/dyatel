@@ -3,15 +3,15 @@
 <br>
 
 ## v3.1.0
-*Release date: 2025-01-29*
+*Release date: 2025-01-28*
 
 ### Added
-- [Kitchen Sink](https://mops.readthedocs.io/kitchen_sink/index.html) section on ReadTheDocs
-- Source code links for interfaces in ReadTheDocs [< example> ](https://mops.readthedocs.io/_modules/mops/base/driver_wrapper.html#DriverWrapper.save_screenshot)
+- [Kitchen Sink](https://mops.readthedocs.io/3.1.0/kitchen_sink/index.html) section on ReadTheDocs
+- Source code links for interfaces in ReadTheDocs [< example > ](https://mops.readthedocs.io/3.1.0/_modules/mops/base/driver_wrapper.html#DriverWrapper.save_screenshot)
 - `PlayDriver.delete_cookie` method
 - `PlayDriver.switch_to_frame` method
 - `PlayDriver.switch_to_default_content` method
-- `LocatorType` constants [< more info >](https://mops.readthedocs.io/kitchen_sink/locator_type.html)
+- `LocatorType` constants [< more info >](https://mops.readthedocs.io/3.1.0/kitchen_sink/locator_type.html)
 
 ### Changed
 - **Breaking:** Minimum Playwright version is now [1.48.0](https://pypi.org/project/playwright/1.48.0/)
@@ -30,8 +30,8 @@
 - `Element.value` now returns an empty string instead of `None`
 
 ### Removed
-- **Breaking:** Removed `Locator.loc_type` attribute/argument [< how to provide locator type >](https://mops.readthedocs.io/kitchen_sink/locator_type.html)
-- **Breaking:** Removed `CutBox` dataclass [< use Box instead >](https://mops.readthedocs.io/kitchen_sink/box.html)
+- **Breaking:** Removed `Locator.loc_type` attribute/argument [< how to provide locator type >](https://mops.readthedocs.io/3.1.0/kitchen_sink/locator_type.html)
+- **Breaking:** Removed `CutBox` dataclass [< use Box instead >](https://mops.readthedocs.io/3.1.0/kitchen_sink/box.html)
 
 ### Reworked
 - Unified selector synchronization methods across all frameworks
