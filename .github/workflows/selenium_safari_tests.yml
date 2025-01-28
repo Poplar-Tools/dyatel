@@ -6,7 +6,7 @@ on:
       - '**'
     paths-ignore:
       - 'docs/**'
-      - 'tests/static_tests'
+      - 'tests/static_tests/**'
       - 'README.md'
       - 'CHANGELOG.md'
       - 'LICENSE'
