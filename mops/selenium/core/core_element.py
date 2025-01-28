@@ -390,7 +390,10 @@ class CoreElement(ElementABC, ABC):
 
         :return: :class:`bool` - :obj:`True` if present in DOM
         """
-        element = safe_call(self._find_element, wait_parent=False)
+        try:
+            element = safe_call(self._find_element, wait_parent=False)
+        except SeleniumInvalidSelectorException as exc:
+            raise InvalidSelectorException(exc.msg) from None
 
         return bool(element)
 

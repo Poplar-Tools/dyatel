@@ -7,7 +7,7 @@ from typing import Union, List, Any
 from PIL.Image import Image
 from mops.keyboard_keys import KeyboardKeys
 from mops.mixins.objects.scrolls import ScrollTo, ScrollTypes
-from playwright.sync_api import TimeoutError as PlayTimeoutError
+from playwright.sync_api import TimeoutError as PlayTimeoutError, Error
 from playwright.sync_api import Page as PlaywrightPage
 from playwright.sync_api import Locator, Page, Browser, BrowserContext
 
@@ -15,7 +15,7 @@ from mops.mixins.objects.size import Size
 from mops.mixins.objects.location import Location
 from mops.utils.selector_synchronizer import get_platform_locator, set_playwright_locator
 from mops.abstraction.element_abc import ElementABC
-from mops.exceptions import TimeoutException
+from mops.exceptions import TimeoutException, InvalidSelectorException
 from mops.utils.logs import Logging
 from mops.shared_utils import cut_log_data, get_image
 from mops.utils.internal_utils import (
@@ -435,7 +435,11 @@ class PlayElement(ElementABC, Logging, ABC):
         if not silent:
             self.log(f'Check visibility of "{self.name}"')
 
-        return self._first_element.is_visible()
+        try:
+            return self._first_element.is_visible()
+        except Error as exc:
+            raise InvalidSelectorException(exc.message) from None
+
 
     def is_hidden(self, silent: bool = False) -> bool:
         """

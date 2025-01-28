@@ -1,10 +1,12 @@
+import contextlib
 import random
 
 import pytest
 
+from mops.base.element import Element
 from mops.mixins.internal_mixin import get_element_info
 from tests.adata.pages.expected_condition_page import WaitValueCardBroken
-from mops.exceptions import NoSuchElementException, NoSuchParentException
+from mops.exceptions import NoSuchElementException, NoSuchParentException, InvalidSelectorException
 from tests.adata.pages.keyboard_page import KeyboardPage
 
 
@@ -157,3 +159,56 @@ def test_element_execute_script(forms_page, driver_wrapper):
     new_text = 'driver wrapper automation'
     forms_page.controls_form.german_slider.execute_script('arguments[0].textContent = arguments[1];', new_text)
     assert forms_page.controls_form.german_slider.text == new_text
+
+def test_element_locator_check(mouse_event_page, driver_wrapper):
+    # Let's keep Elements here, for encapsulation purposes
+    # Reformat test if any trouble occur
+    locators = (
+        '.card.text-center',
+        '[class *= card][class *= text-center]',
+        '#footer',
+        '[href*="https://www.linkedin.com/in"]'
+    )
+    invalid_prefixes = ('xpath', 'text', 'id')
+
+    for locator in locators:
+        assert Element(locator).is_displayed()
+        assert Element(f'css={locator}').is_displayed()
+        for invalid_prefix in invalid_prefixes:
+            with contextlib.suppress(InvalidSelectorException):
+                assert not Element(f'{invalid_prefix}={locator}').is_displayed()
+
+    locators = ('//*[contains(@class, "card")]', '//body/div')
+    invalid_prefixes = ('css', 'text', 'id')
+    for locator in locators:
+        assert Element(locator).is_displayed()
+        assert Element(f'xpath={locator}').is_displayed()
+        for invalid_prefix in invalid_prefixes:
+            with contextlib.suppress(InvalidSelectorException):
+                assert not Element(f'{invalid_prefix}={locator}').is_displayed()
+
+    locators = ('drop_target', 'drag_source')
+    invalid_prefixes = ('css', 'xpath', 'text')
+    for locator in locators:
+        assert Element(locator).is_displayed()
+        assert Element(f'id={locator}').is_displayed()
+
+        for invalid_prefix in invalid_prefixes:
+            with contextlib.suppress(InvalidSelectorException):
+                assert not Element(f'{invalid_prefix}={locator}').is_displayed()
+
+    choose_lang_button_name = 'Choose Language'
+    locators = (choose_lang_button_name, )
+    invalid_prefixes = ('css', 'xpath', 'id')
+    for locator in locators:
+        breakpoint()
+        assert Element(locator).is_displayed()
+        assert Element(f'text={locator}').is_displayed()
+        if locator == choose_lang_button_name:  # Move to separate test
+            assert not Element('.dropdown-content').is_displayed()
+            Element(locator).scroll_into_view().click()
+            Element('.dropdown-content').wait_visibility()
+
+        for invalid_prefix in invalid_prefixes:
+            with contextlib.suppress(InvalidSelectorException):
+                assert not Element(f'{invalid_prefix}={locator}').is_displayed()

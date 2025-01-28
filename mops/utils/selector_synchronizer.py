@@ -92,7 +92,7 @@ def set_selenium_selector(obj: Any):
     elif " " in locator:
         obj.locator = f'//*[contains(text(), "{locator}")]'
         obj.locator_type = By.XPATH
-        obj.log_locator = f'{LocatorType.XPATH}={locator}'
+        obj.log_locator = f'{LocatorType.XPATH}={obj.locator}'
 
     # Default to ID if nothing else matches
 
@@ -108,33 +108,35 @@ def set_playwright_locator(obj: Any):
     Sets playwright locator & locator type
     """
     locator = obj.locator.strip()
+    obj.log_locator = locator
 
     # Checking the supported locators
 
     if locator.startswith(DEFAULT_MATCH):
-        pass
+        obj.locator_type = locator.partition('=')[0]
+        return
 
     # Checking the regular locators
 
     elif locator.startswith(XPATH_MATCH):
-        obj.locator = f"{LocatorType.XPATH}={locator}"
+        obj.locator_type = LocatorType.XPATH
 
     elif locator.startswith(CSS_MATCH) or re.search(CSS_REGEXP, locator):
-        obj.locator = f"{LocatorType.CSS}={locator}"
+        obj.locator_type = LocatorType.CSS
 
-    elif locator in all_tags:
-        obj.locator = f'{LocatorType.CSS}={locator}'
+    elif locator in all_tags or all(tag in all_tags for tag in locator.split()):
+        obj.locator_type = LocatorType.CSS
 
     elif " " in locator:
-        obj.locator = f"{LocatorType.TEXT}={locator}"
+        obj.locator_type = LocatorType.TEXT
 
     # Default to ID if nothing else matches
 
     else:
-        obj.locator = f"{LocatorType.ID}={locator}"
+        obj.locator_type = LocatorType.ID
 
+    obj.locator = f'{obj.locator_type}={locator}'
     obj.log_locator = obj.locator
-    obj.locator_type = None
 
 
 def set_appium_selector(obj: Any):
