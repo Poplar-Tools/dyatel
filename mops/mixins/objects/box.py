@@ -22,7 +22,7 @@ class Box:
     is_percents: InitVar[bool] = False
 
     def __post_init__(self, is_percents: InitVar[bool]):
-        self.is_percents = is_percents  # is_percents will be ignored in `fields` method
+        self.is_percents = is_percents  # is_percents will be ignored in `fields` and other dataclasses methods
 
     def fill_values(self) -> None:
         """
@@ -43,9 +43,9 @@ class Box:
         This method computes the values of the left, top, right, and bottom edges,
         adjusting for whether the values are absolute or percentages of the image's size.
 
-        :param size: A tuple containing the width and height of the image size.
+        :param size: :class:`.Size` object containing the width and height of the image size.
         :type size: Size
-        :return: A :obj:`typing.Tuple` representing the coordinates of the cut box (left, top, right, bottom).
+        :return: New :obj:`.Box` object representing the coordinates of the cut box (left, top, right, bottom).
         """
         width, height = size.width, size.height
         self.fill_values()

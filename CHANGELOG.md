@@ -2,6 +2,43 @@
 
 <br>
 
+## v3.1.0
+*Release date: 2025-01-29*
+
+### Added
+- [Kitchen Sink](https://mops.readthedocs.io/kitchen_sink/index.html) section on ReadTheDocs
+- Source code links for interfaces in ReadTheDocs [< example> ](https://mops.readthedocs.io/_modules/mops/base/driver_wrapper.html#DriverWrapper.save_screenshot)
+- `PlayDriver.delete_cookie` method
+- `PlayDriver.switch_to_frame` method
+- `PlayDriver.switch_to_default_content` method
+- `LocatorType` constants [< more info >](https://mops.readthedocs.io/kitchen_sink/locator_type.html)
+
+### Changed
+- **Breaking:** Minimum Playwright version is now [1.48.0](https://pypi.org/project/playwright/1.48.0/)
+- **Breaking:** `DriverWrapper.get_inner_window_size` now returns a `Size` object instead of a `tuple`
+- **Breaking:** `DriverWrapper.set_window_size` now sets the inner window size (affects Selenium only)
+- **Breaking:** `Box.get_image_cut_box` now accepts a `Size` object for the `size` argument and returns a `Box` object
+- `PlayDriver.get_inner_window_size` now retrieves `page.viewport_size` instead of using a custom JavaScript script
+- Improved error logging for `Element`: Selector output has been adjusted
+- `Element` representation: `locator_type` is now part of `locator`
+- Reduced exception inheritance in `VisualComparison`
+- Improved most docstrings
+
+### Fixed
+- `Element.wait_for_value` now correctly handles an empty `expected_value` argument
+- `Element.wait_for_text` now correctly handles an empty `expected_text` argument
+- `Element.value` now returns an empty string instead of `None`
+
+### Removed
+- **Breaking:** Removed `Locator.loc_type` attribute/argument [< how to provide locator type >](https://mops.readthedocs.io/kitchen_sink/locator_type.html)
+- **Breaking:** Removed `CutBox` dataclass [< use Box instead >](https://mops.readthedocs.io/kitchen_sink/box.html)
+
+### Reworked
+- Unified selector synchronization methods across all frameworks
+- Improved automatic locator type detection
+
+---
+
 ## v3.0.0  
 *Release date: 2025-01-13*
 

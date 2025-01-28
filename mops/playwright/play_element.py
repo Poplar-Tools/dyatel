@@ -70,7 +70,7 @@ class PlayElement(ElementABC, Logging, ABC):
         self._element = base_element
     
     @property
-    def all_elements(self) ->Union[List[PlayElement], List[Any]]:
+    def all_elements(self) -> Union[List[PlayElement], List[Any]]:
         """
         Returns a list of all matching elements.
 

@@ -8,9 +8,9 @@ class LocatorType:
     .. note::
         You can specify a locator type along with your locator using the following syntax:
 
-        - :obj:`Element('xpath=//*[@class="class-attribute"]')`
-        - :obj:`Element('css=//*[@class="class-attribute"]')`
-        - :obj:`Element('text=some text')`
+        - :obj:`Element('xpath=//*[@class="class-name"]')`
+        - :obj:`Element('css=[class *= class-name]')`
+        - :obj:`Element('text=some text with spaces')`
         - :obj:`Element('id=id-without-spaces')`
 
         The same applies to the :class:`.Locator` object:
@@ -20,7 +20,7 @@ class LocatorType:
     .. note::
         For better readability, you can use this class with the following syntax:
 
-        - :obj:`Element(f'{LocatorType.XPATH}=//*[@class="class-attribute"]')`
+        - :obj:`Element(f'{LocatorType.XPATH}=//*[@class="class-name"]')`
     """
     CSS: str = 'css'
     XPATH: str = 'xpath'
