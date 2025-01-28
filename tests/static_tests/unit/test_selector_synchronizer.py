@@ -18,7 +18,7 @@ from mops.utils.selector_synchronizer import set_selenium_selector, set_playwrig
         ("button", "button", By.CSS_SELECTOR, "css=button"),
         ("tbody tr td span", "tbody tr td span", By.CSS_SELECTOR, "css=tbody tr td span"),
         ("textarea", "textarea", By.CSS_SELECTOR, "css=textarea"),
-        ("Some text", '//*[contains(text(), "Some text")]', By.XPATH, "xpath=Some text"),
+        ("Some text", '//*[contains(text(), "Some text")]', By.XPATH, 'xpath=//*[contains(text(), "Some text")]'),
         ("[href='/some/url']", "[href='/some/url']", By.CSS_SELECTOR, "css=[href='/some/url']"),
     ],
 )
@@ -26,8 +26,8 @@ def test_set_selenium_selector(locator_input, expected_locator, expected_locator
     mock_obj = SimpleNamespace()
     mock_obj.locator = locator_input
     set_selenium_selector(mock_obj)
-    assert mock_obj.locator == expected_locator
-    assert mock_obj.log_locator == expected_log_locator
+    assert expected_locator == mock_obj.locator
+    assert expected_log_locator == mock_obj.log_locator
 
 
 @pytest.mark.parametrize(
@@ -49,6 +49,6 @@ def test_set_playwright_locator(locator_input, expected_locator):
     mock_obj = SimpleNamespace()
     mock_obj.locator = locator_input
     set_playwright_locator(mock_obj)
-    assert mock_obj.locator == expected_locator
-    assert mock_obj.log_locator == expected_locator
-    assert mock_obj.locator_type == expected_locator.partition('=')[0]
+    assert expected_locator == mock_obj.locator
+    assert expected_locator == mock_obj.log_locator
+    assert expected_locator.partition('=')[0] == mock_obj.locator_type
