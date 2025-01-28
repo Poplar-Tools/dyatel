@@ -201,7 +201,6 @@ def test_element_locator_check(mouse_event_page, driver_wrapper):
     locators = (choose_lang_button_name, )
     invalid_prefixes = ('css', 'xpath', 'id')
     for locator in locators:
-        breakpoint()
         assert Element(locator).is_displayed()
         assert Element(f'text={locator}').is_displayed()
         if locator == choose_lang_button_name:  # Move to separate test
