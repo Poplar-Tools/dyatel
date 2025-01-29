@@ -22,6 +22,7 @@
 - Improved error logging for `Element`: Selector output has been adjusted
 - `Element` representation: `locator_type` is now part of `locator`
 - Reduced exception inheritance in `VisualComparison`
+- Selenium & Appium error logging
 - Improved most docstrings
 
 ### Fixed
