@@ -12,3 +12,8 @@ The `Group` class is a fundamental building block for creating Page Object Model
 It provides a comprehensive set of methods, identical to the `Element` class. 
 
 **Refer to the {doc}`Element Interface <../element_object/interface>` for available APIs.**
+
+```{eval-rst}  
+.. autoclass:: mops.base.group.Group
+   :special-members: __init__
+```

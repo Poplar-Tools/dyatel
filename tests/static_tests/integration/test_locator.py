@@ -14,14 +14,14 @@ mobile_locator = 'mobile_locator'
 
 class ExtendedClass(Group):
     def __init__(self, locator='group1', name='group1'):
-        super().__init__(locator=f'{locator} updated', name=name)
+        super().__init__(locator=f'{locator}_updated', name=name)
 
 
 class SomeGroup(Group):
     def __init__(self):
         super().__init__(Locator('default_group', mobile='mobile_group'))
 
-    link_to_class = ExtendedClass('some locator', name='nested element')  # all elements initialised two times
+    link_to_class = ExtendedClass('some_locator', name='nested element')  # all elements initialised two times
 
     multiple_element_partial = Element(
         Locator(desktop='desktop_locator', mobile=mobile_locator),
@@ -36,13 +36,13 @@ class SomeGroup(Group):
 @pytest.mark.parametrize('driver', mobile_drivers, ids=mobile_ids)
 def test_link_to_class_locator_mobile(driver, request):
     request.getfixturevalue(driver)
-    assert SomeGroup().link_to_class.locator == '[id="some locator updated"]'
+    assert SomeGroup().link_to_class.locator == '[id="some_locator_updated"]'
 
 
 @pytest.mark.parametrize('driver', desktop_drivers, ids=desktop_ids)
 def test_link_to_class_locator_desktop(driver, request):
     request.getfixturevalue(driver)
-    assert 'some locator updated' in SomeGroup().link_to_class.locator
+    assert 'some_locator_updated' in SomeGroup().link_to_class.locator
 
 
 def test_multiple_locator_ios1(mocked_ios_driver):

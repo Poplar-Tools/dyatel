@@ -12,6 +12,8 @@ from playwright.sync_api import (
 
 @dataclass
 class Driver:
+    """Represents a web or mobile driver, supporting Appium, Selenium, and Playwright."""
+
     driver: Union[AppiumDriver, SeleniumWebDriver, PlaywrightDriver]
     context: Union[PlaywrightContext, None] = None
     instance: Union[PlaywrightBrowser, None] = None

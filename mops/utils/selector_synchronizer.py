@@ -1,15 +1,20 @@
 from __future__ import annotations
 
+import re
 from typing import Any, Union
 
 from selenium.webdriver.common.by import By
 
-from mops.exceptions import InvalidSelectorException, InvalidLocatorException
+from mops.exceptions import InvalidLocatorException
 from mops.mixins.objects.locator import Locator
-from mops.utils.internal_utils import get_child_elements, all_tags
+from mops.mixins.objects.locator_type import LocatorType
+from mops.utils.internal_utils import all_tags
 
 
-selenium_locator_types = get_child_elements(By, str)
+DEFAULT_MATCH = (f"{LocatorType.XPATH}=", f"{LocatorType.ID}=", f"{LocatorType.CSS}=", f"{LocatorType.TEXT}=")
+XPATH_MATCH = ("/", "./", "(/")
+CSS_MATCH = ("#", ".")
+CSS_REGEXP = r"[#.\[\]=]"
 
 
 def get_platform_locator(obj: Any):
@@ -26,6 +31,8 @@ def get_platform_locator(obj: Any):
 
     mobile_fallback_locator = locator.mobile or locator.default
 
+    if obj.driver_wrapper.is_desktop:
+        locator = locator.desktop or locator.default
     if obj.driver_wrapper.is_tablet:
         locator = locator.tablet or locator.default
     elif obj.driver_wrapper.is_android:
@@ -34,8 +41,6 @@ def get_platform_locator(obj: Any):
         locator = locator.ios or mobile_fallback_locator
     elif obj.driver_wrapper.is_mobile:
         locator = mobile_fallback_locator
-    elif obj.driver_wrapper.is_desktop:
-        locator = locator.desktop or locator.default
 
     if not isinstance(locator, str):
         raise InvalidLocatorException(f'Cannot extract locator for current platform for following object: {obj}')
@@ -43,93 +48,107 @@ def get_platform_locator(obj: Any):
     return locator
 
 
-def get_selenium_locator_type(locator: str):
+def set_selenium_selector(obj: Any):
     """
-    Get selenium completable locator type by given locator spell
-
-    :param locator: regular locator
-    :return:
-      By.ID if locator contain ":id" - com.android locator
-      By.TAG_NAME if locator contain tag name
-      By.XPATH if locator contain slashes and brackets
-      By.CSS_SELECTOR if locator contain brackets and no slash
-      By.CSS_SELECTOR if locator contain dot and no brackets
-      By.ID if there is no any match
+    Sets selenium locator & locator type
     """
-    if locator in selenium_locator_types:
-        raise InvalidSelectorException(
-            f'An locator_type given instead of locator. Ensure your locator is not one of {selenium_locator_types}'
-        )
+    locator = obj.locator.strip()
+    obj.log_locator = locator
 
-    brackets = '[' in locator and ']' in locator
-    is_only_tags = True
+    # Checking the supported locators
 
-    if locator in all_tags:
-        return By.TAG_NAME
-    elif ':id' in locator:  # Mobile com.android selector
-        return By.ID
-    elif '/' in locator:
-        return By.XPATH
-    elif '/' not in locator and brackets:
-        return By.CSS_SELECTOR
-    elif '.' in locator and not brackets:
-        return By.CSS_SELECTOR
-    elif '#' in locator:
-        return By.CSS_SELECTOR
+    if locator.startswith(f"{LocatorType.XPATH}="):
+        obj.locator = obj.locator.split(f"{LocatorType.XPATH}=")[-1]
+        obj.locator_type = By.XPATH
 
-    for tag in locator.split(' '):
-        is_only_tags = is_only_tags and tag in all_tags
+    elif locator.startswith(f"{LocatorType.TEXT}="):
+        locator = obj.locator.split(f"{LocatorType.TEXT}=")[-1]
+        obj.locator = f'//*[contains(text(), "{locator}")]'
+        obj.locator_type = By.XPATH
 
-    if is_only_tags:
-        return By.TAG_NAME
+    elif locator.startswith(f"{LocatorType.CSS}="):
+        obj.locator = obj.locator.split(f"{LocatorType.CSS}=")[-1]
+        obj.locator_type = By.CSS_SELECTOR
 
-    return By.ID
+    elif locator.startswith(f"{LocatorType.ID}="):
+        locator = obj.locator.split(f"{LocatorType.ID}=")[-1]
+        obj.locator = f'[{LocatorType.ID}="{locator}"]'
+        obj.locator_type = By.CSS_SELECTOR
 
+    # Checking the regular locators
 
-def get_appium_selector(locator: str, locator_type: str):
-    """
-    Workaround for using same locators for selenium and appium objects.
-    More info here https://github.com/appium/python-client/pull/724
+    elif locator.startswith(XPATH_MATCH):
+        obj.locator_type = By.XPATH
+        obj.log_locator = f'{LocatorType.XPATH}={locator}'
 
-    :param locator: regular locator
-    :param locator_type: updated locator type from get_locator_type
-    :return: selenium like locator and locator_type
-    """
-    if locator_type == By.ID:
-        locator = f'[id="{locator}"]'
-        locator_type = By.CSS_SELECTOR
-    elif locator_type == By.TAG_NAME:
-        locator_type = By.CSS_SELECTOR
-    elif locator_type == By.CLASS_NAME:
-        locator = f".{locator}"
-        locator_type = By.CSS_SELECTOR
-    elif locator_type == By.NAME:
-        locator = f'[name="{locator}"]'
-        locator_type = By.CSS_SELECTOR
-    return locator, locator_type
+    elif locator.startswith(CSS_MATCH) or re.search(CSS_REGEXP, locator):
+        obj.locator_type = By.CSS_SELECTOR
+        obj.log_locator = f'{LocatorType.CSS}={locator}'
 
+    elif locator in all_tags or all(tag in all_tags for tag in locator.split()):
+        obj.locator_type = By.CSS_SELECTOR
+        obj.log_locator = f'{LocatorType.CSS}={locator}'
 
-def get_playwright_locator(locator: str):
-    """
-    Get playwright locator from selenium based
+    elif " " in locator:
+        obj.locator = f'//*[contains(text(), "{locator}")]'
+        obj.locator_type = By.XPATH
+        obj.log_locator = f'{LocatorType.XPATH}={obj.locator}'
 
-    :param locator: locator in selenium format ~ '//div[@class="some-class"]'
-    :return: locator in playwright format ~ 'xpath=//div[@class="some-class"]'
-    """
-    brackets = '[' in locator and ']' in locator
+    # Default to ID if nothing else matches
 
-    if 'xpath=' in locator or 'id=' in locator:
-        return locator
-
-    if locator in all_tags:
-        return locator
-    elif '/' in locator:
-        return f'xpath={locator}'
-    elif '/' not in locator and brackets:
-        return locator
-    elif '.' in locator and not brackets:
-        return locator
-    elif '#' in locator:
-        return locator
     else:
-        return f'id={locator}'
+        locator = obj.locator.split(f"{LocatorType.ID}=")[-1]
+        obj.locator = f'[{LocatorType.ID}="{locator}"]'
+        obj.locator_type = By.CSS_SELECTOR
+        obj.log_locator = f'{LocatorType.ID}={locator}'
+
+
+def set_playwright_locator(obj: Any):
+    """
+    Sets playwright locator & locator type
+    """
+    locator = obj.locator.strip()
+    obj.log_locator = locator
+
+    # Checking the supported locators
+
+    if locator.startswith(DEFAULT_MATCH):
+        obj.locator_type = locator.partition('=')[0]
+        return
+
+    # Checking the regular locators
+
+    elif locator.startswith(XPATH_MATCH):
+        obj.locator_type = LocatorType.XPATH
+
+    elif locator.startswith(CSS_MATCH) or re.search(CSS_REGEXP, locator):
+        obj.locator_type = LocatorType.CSS
+
+    elif locator in all_tags or all(tag in all_tags for tag in locator.split()):
+        obj.locator_type = LocatorType.CSS
+
+    elif " " in locator:
+        obj.locator_type = LocatorType.TEXT
+
+    # Default to ID if nothing else matches
+
+    else:
+        obj.locator_type = LocatorType.ID
+
+    obj.locator = f'{obj.locator_type}={locator}'
+    obj.log_locator = obj.locator
+
+
+def set_appium_selector(obj: Any):
+    """
+    Sets appium locator & locator type
+    """
+    set_selenium_selector(obj)
+
+    locator = obj.locator.strip()
+
+    # Mobile com.android selector
+
+    if ':id' in locator:
+        obj.locator_type = By.CSS_SELECTOR
+        obj.log_locator = f'{LocatorType.ID}={locator}'

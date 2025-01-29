@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Union, List
+from typing import Any, Union, List, Optional
 
 from mops.base.driver_wrapper import DriverWrapper
 from mops.base.element import Element
@@ -14,7 +14,19 @@ from mops.utils.internal_utils import (
 
 
 class Group(Element):
-    """ Group of elements. Should be defined as class """
+    """
+    Represents a group of :class:`.Element`.
+
+    The :class:`.Group` class is an independent class
+    that can be used to manage a collection of :class:`.Element` objects.
+
+    However, it can be imported and defined as a class variable
+    within a :class:`.Page` or another :class:`.Group` class.
+    This allows grouping elements together and interacting with them collectively.
+
+    This class provides functionality for handling element locators,
+    initialization with respect to the driver, and managing sub-elements within the group.
+    """
 
     _object = 'group'
 
@@ -23,20 +35,33 @@ class Group(Element):
 
     def __init__(
             self,
-            locator: Union[Locator, str] = '',
+            locator: Union[Locator, str],
             name: str = '',
-            parent: Union[Any, False] = None,
-            wait: bool = None,
+            parent: Union[Group, Element, bool] = None,
+            wait: Optional[bool] = None,
             driver_wrapper: Union[DriverWrapper, Any] = None,
     ):
         """
-        Initializing of group based on current driver
+        Initializes a group of elements based on the current driver.
 
-        :param locator: anchor locator of group. Can be defined without locator_type
-        :param name: name of group (will be attached to logs)
-        :param parent: parent of element. Can be Group or Page objects of False for skip
-        :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
-        :param driver_wrapper: set custom driver for group and group elements
+        If no driver is provided, the initialization will be skipped until
+         handled by a :class:`.Page` or :class:`.Group` class.
+        The :class:`.Group` class is designed to represent a container for other elements,
+         with specific methods to manage child elements, locator handling, and initialization
+         with respect to the driver.
+
+        :param locator: The anchor locator for the group. `.LocatorType` is optional.
+        :type locator: typing.Union[Locator, str]
+        :param name: The name of the group, used for logging and identification purposes.
+        :type name: str
+        :param parent: The parent group. Provide :obj:`False` to skip the association.
+        :type parent: typing.Union[Group, Element, bool]
+        :param wait: If set to `True`, the entire group will be checked as
+         part of the `wait_page_loaded` and `is_page_opened` methods in the :class:`.Page`.
+        :type wait: typing.Optional[bool]
+        :param driver_wrapper: The :class:`.DriverWrapper` instance or
+         an object containing it to be used for entire group.
+        :type driver_wrapper: typing.Union[DriverWrapper, typing.Any]
         """
         self._init_locals = locals()
         super().__init__(

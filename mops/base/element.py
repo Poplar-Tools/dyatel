@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from copy import copy
-from typing import Union, List, Type, Tuple, Optional
+from typing import Union, List, Type, Tuple, Optional, TYPE_CHECKING
 
 from PIL.Image import Image
+
 from mops.mixins.objects.wait_result import Result
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -18,7 +19,7 @@ from mops.selenium.elements.mobile_element import MobileElement
 from mops.selenium.elements.web_element import WebElement
 from mops.mixins.driver_mixin import get_driver_wrapper_from_object, DriverMixin
 from mops.mixins.internal_mixin import InternalMixin, get_element_info
-from mops.mixins.objects.cut_box import CutBox
+from mops.mixins.objects.box import Box
 from mops.mixins.objects.locator import Locator
 from mops.mixins.objects.size import Size
 from mops.utils.logs import Logging, LogLevel
@@ -37,9 +38,19 @@ from mops.utils.internal_utils import (
     wait_condition,
 )
 
+if TYPE_CHECKING:
+    from mops.base.group import Group
+
 
 class Element(DriverMixin, InternalMixin, Logging, ElementABC):
-    """ Element object crossroad. Should be defined as Page/Group class variable """
+    """
+    Represents a UI element that serves as a central component for interaction.
+
+    The :class:`Element` class is designed to be used within :class:`.Page` or :class:`.Group` objects.
+
+    It dynamically adapts to different driver types (Playwright, Appium, Selenium)
+    and provides a unified interface for UI interactions.
+    """
 
     _object = 'element'
     _base_cls: Type[PlayElement, MobileElement, WebElement]
@@ -70,24 +81,35 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             self,
             locator: Union[Locator, str],
             name: str = '',
-            parent: Union[Any, False] = None,
-            wait: bool = None,
+            parent: Union[Group, Element, bool] = None,
+            wait: Optional[bool] = None,
             driver_wrapper: Union[DriverWrapper, Any] = None,
     ):
         """
-        Initializing of element based on current driver
-        Skip init if there are no driver, so will be initialized in Page/Group
+        Initializes an Element based on the current driver.
 
-        :param locator: locator of element. Can be defined without locator_type
-        :param name: name of element (will be attached to logs)
-        :param parent: parent of element. Can be Group or other Element objects or False for skip
-        :param wait: include wait/checking of element in wait_page_loaded/is_page_opened methods of Page
+        If no driver is available, initialization is skipped and will be handled later in a Page or Group.
+
+        :param locator: The element's locator. `.LocatorType` is optional.
+        :type locator: typing.Union[Locator, str]
+        :param name: The name of the element, used for logging and identification purposes.
+        :type name: str
+        :param parent: The parent of the element. Provide :obj:`False` to skip association.
+        :type parent: typing.Union[Group, Element, bool]
+        :param wait: If `True`, the element will be checked in
+         `wait_page_loaded` and `is_page_opened` methods of `Page`.
+        :type wait: typing.Optional[bool]
+        :param driver_wrapper: The :class:`.DriverWrapper` instance or
+         an object containing it to be used for this element.
+        :type driver_wrapper: typing.Union[DriverWrapper, typing.Any]
         """
         self._validate_inheritance()
 
         if parent:
-            assert isinstance(parent, (bool, Element)), \
-                f'The "parent" of "{self.name}" should take an Element/Group object or False for skip. Get {parent}'
+            if not isinstance(parent, (bool, Element)):
+                error = (f'The given "parent" arg of "{self.name}" should take an Element/Group '
+                         f'object or False for skip. Get {parent}')
+                raise ValueError(error)
 
         self.locator = locator
         self.name = name if name else locator
@@ -130,7 +152,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             raise DriverWrapperException(f'Cant specify {self.__class__.__name__}')
 
         self._set_static(self._base_cls)
-        self._base_cls.__init__(self, locator=self.locator)
+        self._base_cls.__init__(self)
         self._initialized = True
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using internal methods
@@ -189,7 +211,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
           with each iteration during the waiting process.
 
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`QUARTER_WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -227,7 +249,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
           with each iteration during the waiting process.
 
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`QUARTER_WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -269,14 +291,14 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param expected_text: The text to wait for. :obj:`None` - any text; :class:`str` - expected text.
         :type expected_text: typing.Optional[str]
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
         """
         actual_text = self.text
 
-        if expected_text:
+        if expected_text is not None:
             result = actual_text == expected_text
             error = f'Not expected text for "{self.name}"'
             log_msg = f'Wait until text of "{self.name}" will be equal to "{expected_text}"'
@@ -314,14 +336,14 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param expected_value: The value to waiting for. :obj:`None` - any value; :class:`str` - expected value.
         :type expected_value: typing.Optional[str]
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
         """
         actual_value = self.value
 
-        if expected_value:
+        if expected_value is not None:
             result = actual_value == expected_value
             error = f'Not expected value for "{self.name}"'
             log_msg = f'Wait until value of "{self.name}" will be equal to "{expected_value}"'
@@ -351,7 +373,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
           with each iteration during the waiting process.
 
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -401,7 +423,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             silent: bool = False
     ) -> Element:
         """
-        Wait until element size will be equal to given :class:`Size` object
+        Wait until element size will be equal to given :class:`.Size` object
 
         **Note:** The method requires the use of named arguments except ``expected_size``.
 
@@ -417,9 +439,9 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
           with each iteration during the waiting process.
 
         :param expected_size: expected element size
-        :type expected_size: :class:`Size`
+        :type expected_size: :class:`.Size`
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -475,7 +497,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
 
     @property
-    def all_elements(self) -> List[Element]:
+    def all_elements(self) -> Union[List[Element], List[Any]]:
         """
         Returns a list of all matching elements.
 
@@ -603,7 +625,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             scroll: bool = False,
             remove: Union[Element, List[Element]] = None,
             fill_background: Union[str, bool] = False,
-            cut_box: CutBox = None,
+            cut_box: Box = None,
             hide: Union[Element, List[Element]] = None,
     ) -> None:
         """
@@ -620,10 +642,10 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :type name_suffix: str
         :param threshold: The acceptable threshold for comparing screenshots.
           If :obj:`None` - takes default threshold or calculate its automatically based on screenshot size.
-        :type threshold: typing.Optional[int or float]
+        :type threshold: typing.Optional[int, float]
         :param delay: The delay in seconds before taking the screenshot.
           If :obj:`None` - takes default delay.
-        :type delay: typing.Optional[int or float]
+        :type delay: typing.Optional[int, float]
         :param scroll: Whether to scroll to the element before taking the screenshot.
         :type scroll: bool
         :param remove: :class:`Element` to remove from the screenshot.
@@ -632,9 +654,9 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param fill_background: The color to fill the background.
           If :obj:`True`, uses a default color (black). If a :class:`str`, uses the specified color.
         :type fill_background: typing.Optional[str or bool]
-        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+        :param cut_box: A :class:`.Box` specifying a region to cut from the screenshot.
             If :obj:`None`, no region is cut.
-        :type cut_box: typing.Optional[CutBox]
+        :type cut_box: typing.Optional[Box]
         :param hide: :class:`Element` to hide in the screenshot.
           Can be a single element or a list of elements.
         :type hide: typing.Optional[Element or typing.List[Element]]
@@ -664,7 +686,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             scroll: bool = False,
             remove: Union[Element, List[Element]] = None,
             fill_background: Union[str, bool] = False,
-            cut_box: CutBox = None,
+            cut_box: Box = None,
             hide: Union[Element, List[Element]] = None,
     ) -> Tuple[bool, str]:
         """
@@ -681,10 +703,10 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :type name_suffix: str
         :param threshold: The acceptable threshold for comparing screenshots.
           If :obj:`None` - takes default threshold or calculate its automatically based on screenshot size.
-        :type threshold: typing.Optional[int or float]
+        :type threshold: typing.Optional[int, float]
         :param delay: The delay in seconds before taking the screenshot.
           If :obj:`None` - takes default delay.
-        :type delay: typing.Optional[int or float]
+        :type delay: typing.Optional[int, float]
         :param scroll: Whether to scroll to the element before taking the screenshot.
         :type scroll: bool
         :param remove: :class:`Element` to remove from the screenshot.
@@ -692,9 +714,9 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         :param fill_background: The color to fill the background.
           If :obj:`True`, uses a default color (black). If a :class:`str`, uses the specified color.
         :type fill_background: typing.Optional[str or bool]
-        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+        :param cut_box: A :class:`.Box` specifying a region to cut from the screenshot.
             If :obj:`None`, no region is cut.
-        :type cut_box: typing.Optional[CutBox]
+        :type cut_box: typing.Optional[Box]
         :param hide: :class:`Element` to hide in the screenshot.
           Can be a single element or a list of elements.
         :return: :class:`typing.Tuple` (:class:`bool`, :class:`str`) - result state and result message

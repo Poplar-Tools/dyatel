@@ -5,7 +5,8 @@ from typing import Union, Any, List, Tuple, Optional, TYPE_CHECKING
 
 from PIL.Image import Image
 from appium.webdriver.extensions.location import Location
-from mops.mixins.objects.cut_box import CutBox
+
+from mops.mixins.objects.box import Box
 from mops.mixins.objects.scrolls import ScrollTo, ScrollTypes
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
 from appium.webdriver.webelement import WebElement as AppiumWebElement
@@ -17,16 +18,16 @@ from mops.mixins.objects.size import Size
 from mops.utils.internal_utils import WAIT_EL, QUARTER_WAIT_EL
 
 if TYPE_CHECKING:
+    from mops.mixins.objects.locator import Locator
     from mops.base.element import Element
 
 
 class ElementABC(MixinABC, ABC):
 
-    locator: str = None
-    locator_type: str = None
-    name: str = None
-    parent: Optional[Element] = None
-    wait: bool = None
+    locator: Union[Locator, str]
+    name: str = ''
+    parent: Union[Any, bool, None] = None
+    wait: Optional[bool] = None
 
     @property
     def element(self) -> Union[SeleniumWebElement, AppiumWebElement, PlayWebElement]:
@@ -51,7 +52,7 @@ class ElementABC(MixinABC, ABC):
         raise NotImplementedError()
 
     @property
-    def all_elements(self) -> Union[list, List[Element]]:
+    def all_elements(self) -> Union[List[Element], List[Any]]:
         """
         Returns a list of all matching elements.
 
@@ -374,7 +375,7 @@ class ElementABC(MixinABC, ABC):
         """
         Get the size of the current element, including width and height.
 
-        :return: :class:`Size` - An object representing the element's dimensions.
+        :return: :class:`.Size` - An object representing the element's dimensions.
         """
         raise NotImplementedError()
 
@@ -383,7 +384,7 @@ class ElementABC(MixinABC, ABC):
         """
         Get the location of the current element, including the x and y coordinates.
 
-        :return: :class:`Location` - An object representing the element's position.
+        :return: :class:`.Location` - An object representing the element's position.
         """
         raise NotImplementedError()
 
@@ -529,7 +530,7 @@ class ElementABC(MixinABC, ABC):
         :param expected_text: The text to wait for. :obj:`None` - any text; :class:`str` - expected text.
         :type expected_text: typing.Optional[str]
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -562,7 +563,7 @@ class ElementABC(MixinABC, ABC):
         :param expected_value: The value to waiting for. :obj:`None` - any value; :class:`str` - expected value.
         :type expected_value: typing.Optional[str]
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -592,7 +593,7 @@ class ElementABC(MixinABC, ABC):
           with each iteration during the waiting process.
 
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`QUARTER_WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -622,7 +623,7 @@ class ElementABC(MixinABC, ABC):
           with each iteration during the waiting process.
 
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`QUARTER_WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -647,7 +648,7 @@ class ElementABC(MixinABC, ABC):
           with each iteration during the waiting process.
 
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -687,7 +688,7 @@ class ElementABC(MixinABC, ABC):
             silent: bool = False
     ) -> Element:
         """
-        Wait until element size will be equal to given :class:`Size` object
+        Wait until element size will be equal to given :class:`.Size` object
 
         **Note:** The method requires the use of named arguments except ``expected_size``.
 
@@ -703,9 +704,9 @@ class ElementABC(MixinABC, ABC):
           with each iteration during the waiting process.
 
         :param expected_size: expected element size
-        :type expected_size: :class:`Size`
+        :type expected_size: :class:`.Size`
         :param timeout: The maximum time to wait for the condition (in seconds). Default: :obj:`WAIT_EL`.
-        :type timeout: int or float
+        :type timeout: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -748,12 +749,12 @@ class ElementABC(MixinABC, ABC):
         """
         Scrolls the element into view using a JavaScript script.
 
-        :param block: The scrolling block alignment. One of the :class:`ScrollTo` options.
+        :param block: The scrolling block alignment. One of the :class:`.ScrollTo` options.
         :type block: ScrollTo
-        :param behavior: The scrolling behavior. One of the :class:`ScrollTypes` options.
+        :param behavior: The scrolling behavior. One of the :class:`.ScrollTypes` options.
         :type behavior: ScrollTypes
         :param sleep: Delay in seconds after scrolling. Can be an integer or a float.
-        :type sleep: int or float
+        :type sleep: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`Element`
@@ -770,7 +771,7 @@ class ElementABC(MixinABC, ABC):
             scroll: bool = False,
             remove: Union[Element, List[Element]] = None,
             fill_background: Union[str, bool] = False,
-            cut_box: CutBox = None,
+            cut_box: Box = None,
             hide: Union[Element, List[Element]] = None,
     ) -> None:
         """
@@ -787,10 +788,10 @@ class ElementABC(MixinABC, ABC):
         :type name_suffix: str
         :param threshold: The acceptable threshold for comparing screenshots.
           If :obj:`None` - takes default threshold or calculate its automatically based on screenshot size.
-        :type threshold: typing.Optional[int or float]
+        :type threshold: typing.Optional[int, float]
         :param delay: The delay in seconds before taking the screenshot.
           If :obj:`None` - takes default delay.
-        :type delay: typing.Optional[int or float]
+        :type delay: typing.Optional[int, float]
         :param scroll: Whether to scroll to the element before taking the screenshot.
         :type scroll: bool
         :param remove: :class:`Element` to remove from the screenshot.
@@ -799,9 +800,9 @@ class ElementABC(MixinABC, ABC):
         :param fill_background: The color to fill the background.
           If :obj:`True`, uses a default color (black). If a :class:`str`, uses the specified color.
         :type fill_background: typing.Optional[str or bool]
-        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+        :param cut_box: A :class:`.Box` specifying a region to cut from the screenshot.
             If :obj:`None`, no region is cut.
-        :type cut_box: typing.Optional[CutBox]
+        :type cut_box: typing.Optional[Box]
         :param hide: :class:`Element` to hide in the screenshot.
           Can be a single element or a list of elements.
         :type hide: typing.Optional[Element or typing.List[Element]]
@@ -819,7 +820,7 @@ class ElementABC(MixinABC, ABC):
             scroll: bool = False,
             remove: Union[Element, List[Element]] = None,
             fill_background: Union[str, bool] = False,
-            cut_box: CutBox = None,
+            cut_box: Box = None,
             hide: Union[Element, List[Element]] = None,
     ) -> Tuple[bool, str]:
         """
@@ -836,10 +837,10 @@ class ElementABC(MixinABC, ABC):
         :type name_suffix: str
         :param threshold: The acceptable threshold for comparing screenshots.
           If :obj:`None` - takes default threshold or calculate its automatically based on screenshot size.
-        :type threshold: typing.Optional[int or float]
+        :type threshold: typing.Optional[int, float]
         :param delay: The delay in seconds before taking the screenshot.
           If :obj:`None` - takes default delay.
-        :type delay: typing.Optional[int or float]
+        :type delay: typing.Optional[int, float]
         :param scroll: Whether to scroll to the element before taking the screenshot.
         :type scroll: bool
         :param remove: :class:`Element` to remove from the screenshot.
@@ -847,9 +848,9 @@ class ElementABC(MixinABC, ABC):
         :param fill_background: The color to fill the background.
           If :obj:`True`, uses a default color (black). If a :class:`str`, uses the specified color.
         :type fill_background: typing.Optional[str or bool]
-        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+        :param cut_box: A :class:`.Box` specifying a region to cut from the screenshot.
             If :obj:`None`, no region is cut.
-        :type cut_box: typing.Optional[CutBox]
+        :type cut_box: typing.Optional[Box]
         :param hide: :class:`Element` to hide in the screenshot.
           Can be a single element or a list of elements.
         :return: :class:`typing.Tuple` (:class:`bool`, :class:`str`) - result state and result message

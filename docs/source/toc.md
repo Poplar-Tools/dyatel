@@ -30,7 +30,15 @@ caption: Other
 
 other/objects_initialisation
 other/visual_comparison
-other/locator_object
+```
+
+```{toctree}
+---
+maxdepth: 3
+includehidden:
+---
+
+kitchen_sink/index
 ```
 
 

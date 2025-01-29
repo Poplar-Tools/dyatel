@@ -28,7 +28,17 @@ from mops.utils.internal_utils import (
 
 
 class Page(DriverMixin, InternalMixin, Logging, PageABC):
-    """ Page object crossroad. Should be defined as class """
+    """
+    Represents a page in a web or mobile application.
+
+    The page object encapsulates the necessary logic for interacting with a page using different
+    drivers (Appium, Selenium, Playwright).
+
+    This class should be defined for each specific page in the application,
+    encapsulating the page's :class:`.Element` and groups of elements under :class:`.Group`.
+
+    It supports dynamic driver selection and element management based on the current driver.
+    """
 
     _object = 'page'
     _base_cls: Type[PlayPage, MobilePage, WebPage]
@@ -43,31 +53,31 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
     def __repr__(self):
         return self._repr_builder()
 
-    def __call__(self, *arg, **kwargs):
-        return self
-
     def __init__(
             self,
             locator: Union[Locator, str] = '',
             name: str = '',
-            driver_wrapper: Union[DriverWrapper, Any] = None,
-            **kwargs
+            driver_wrapper: Union[DriverWrapper, Any] = None
     ):
         """
-        Initializing of page based on current driver
+        Initializes a Page based on the current driver.
 
-        :param locator: anchor locator of page. Can be defined without locator_type
-        :param name: name of page (will be attached to logs)
-        :param driver_wrapper: set custom driver for page and page elements
+        :param locator: The anchor locator of the page. `.LocatorType` is optional.
+        :type locator: typing.Union[Locator, str]
+        :param name: The name of the page, used for logging and identification purposes.
+        :type name: str
+        :param driver_wrapper: The :class:`.DriverWrapper` instance or
+         an object containing it to be used for entire page.
+        :type driver_wrapper: typing.Union[DriverWrapper, typing.Any]
         """
         self._validate_inheritance()
-        self._check_kwargs(kwargs)
 
         self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
         
         self.anchor = Element(locator, name=name, driver_wrapper=self.driver_wrapper)
         self.locator = self.anchor.locator
         self.locator_type = self.anchor.locator_type
+        self.log_locator = self.anchor.log_locator
         self.name = self.anchor.name
 
         self.url = getattr(self, 'url', '')

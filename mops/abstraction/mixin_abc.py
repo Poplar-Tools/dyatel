@@ -28,7 +28,7 @@ class MixinABC(ABC):
         """
         Retrieves the driver wrapper instance.
 
-        :return: The current :class:`DriverWrapper` instance that assigned for this object.
+        :return: The current :obj:`.DriverWrapper` instance that assigned for this object.
         :rtype: DriverWrapper
         """
         raise NotImplementedError()

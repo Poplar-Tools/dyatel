@@ -16,30 +16,27 @@ all_locator_types = get_child_elements(AppiumBy, str)
 available_kwarg_keys = ('desktop', 'mobile', 'ios', 'android')
 
 
-def get_element_info(element: Any) -> str:
+def get_element_info(element: Any, label: str = 'Selector=') -> str:
     """
     Get element selector information with parent object selector if it exists
 
     :param element: element to collect log data
+    :param label: a label before selector string
     :return: log string
     """
+    selector = element.log_locator
     parent = element.parent
-    current_data = f'Selector: ["{element.locator_type}": "{element.locator}"]'
+
     if parent:
-        parent_data = f'Parent selector: ["{parent.locator_type}": "{parent.locator}"]'
-        current_data = f'{current_data}. {parent_data}'
-    return current_data
+        selector = f"{get_element_info(parent, label='')} >> {selector}"
+
+    return f"{label}'{selector}'" if label else selector
 
 @lru_cache(maxsize=16)
 def get_static(cls: Any):
     return get_child_elements_with_names(cls).items()
 
 class InternalMixin:
-
-    @staticmethod
-    def _check_kwargs(kwargs):
-        assert all(item in available_kwarg_keys for item in kwargs), \
-            f'The given kwargs is not available. Please provide them according to available keys: {available_kwarg_keys}'
 
     def _safe_setter(self, var: str, value: Any):
         if not hasattr(self, var):
@@ -68,13 +65,12 @@ class InternalMixin:
             parent_class = self.parent.__class__.__name__ if parent else None
             locator_holder = getattr(self, 'anchor', self)
 
-            locator = f'locator="{locator_holder.locator}"'
-            locator_type = f'locator_type="{locator_holder.locator_type}"'
-            name = f'name="{self.name}"'
+            locator = f'locator="{locator_holder.log_locator}", '
+            name = f'name="{self.name}", '
             parent = f'parent={parent_class}'
             driver = f'{self.driver_wrapper.label}={self.driver}'
 
-            base = f'{class_name}({locator}, {locator_type}, {name}, {parent}) at {obj_id}'
+            base = f'{class_name}({locator}{name}{parent}) at {obj_id}'
             additional_info = driver
             return f'{base}, {additional_info}'
         except AttributeError:

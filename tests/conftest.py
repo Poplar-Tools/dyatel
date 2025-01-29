@@ -7,6 +7,7 @@ from selenium.webdriver.safari.options import Options as SafariOptions
 
 from mops.base.driver_wrapper import DriverWrapper
 from mops.mixins.objects.driver import Driver
+from mops.mixins.objects.size import Size
 from mops.utils.logs import driver_wrapper_logs_settings
 from mops.visual_comparison import VisualComparison
 from tests.adata.drivers.driver_entities import DriverEntities
@@ -24,6 +25,8 @@ from tests.adata.pytest_utils import skip_platform
 
 
 driver_wrapper_logs_settings()
+
+DESKTOP_WINDOW_SIZE = Size(1024, 900)
 
 
 def pytest_addoption(parser):
@@ -123,7 +126,7 @@ def driver_func(driver_entities):
     driver_wrapper = DriverWrapper(driver)
 
     if driver_wrapper.is_desktop:
-        driver_wrapper.set_window_size(1024, 900)
+        driver_wrapper.set_window_size(DESKTOP_WINDOW_SIZE)
 
     return driver_wrapper
 

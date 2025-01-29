@@ -7,15 +7,15 @@ from typing import Union, List, Any
 from PIL.Image import Image
 from mops.keyboard_keys import KeyboardKeys
 from mops.mixins.objects.scrolls import ScrollTo, ScrollTypes
-from playwright.sync_api import TimeoutError as PlayTimeoutError
+from playwright.sync_api import TimeoutError as PlayTimeoutError, Error
 from playwright.sync_api import Page as PlaywrightPage
 from playwright.sync_api import Locator, Page, Browser, BrowserContext
 
 from mops.mixins.objects.size import Size
 from mops.mixins.objects.location import Location
-from mops.utils.selector_synchronizer import get_platform_locator, get_playwright_locator
+from mops.utils.selector_synchronizer import get_platform_locator, set_playwright_locator
 from mops.abstraction.element_abc import ElementABC
-from mops.exceptions import TimeoutException
+from mops.exceptions import TimeoutException, InvalidSelectorException
 from mops.utils.logs import Logging
 from mops.shared_utils import cut_log_data, get_image
 from mops.utils.internal_utils import (
@@ -35,14 +35,12 @@ class PlayElement(ElementABC, Logging, ABC):
     parent: Union[ElementABC, PlayElement]
     _element: Locator = None
 
-    def __init__(self, locator: str):  # noqa
+    def __init__(self):  # noqa
         """
         Initializing of web element with playwright driver
-
-        :param locator: anchor locator of page. Can be defined without locator_type
         """
-        self.locator = get_playwright_locator(get_platform_locator(self))
-        self.locator_type = 'locator_type does not supported for playwright'
+        self.locator = get_platform_locator(self)
+        set_playwright_locator(self)
 
     # Element
 
@@ -72,7 +70,7 @@ class PlayElement(ElementABC, Logging, ABC):
         self._element = base_element
     
     @property
-    def all_elements(self) -> Union[list, List[Any]]:
+    def all_elements(self) -> Union[List[PlayElement], List[Any]]:
         """
         Returns a list of all matching elements.
 
@@ -349,12 +347,12 @@ class PlayElement(ElementABC, Logging, ABC):
         """
         Scrolls the element into view using a JavaScript script.
 
-        :param block: The scrolling block alignment. One of the :class:`ScrollTo` options.
+        :param block: The scrolling block alignment. One of the :class:`.ScrollTo` options.
         :type block: ScrollTo
-        :param behavior: The scrolling behavior. One of the :class:`ScrollTypes` options.
+        :param behavior: The scrolling behavior. One of the :class:`.ScrollTypes` options.
         :type behavior: ScrollTypes
         :param sleep: Delay in seconds after scrolling. Can be an integer or a float.
-        :type sleep: int or float
+        :type sleep: typing.Union[int, float]
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
         :return: :class:`PlayElement`
@@ -437,7 +435,11 @@ class PlayElement(ElementABC, Logging, ABC):
         if not silent:
             self.log(f'Check visibility of "{self.name}"')
 
-        return self._first_element.is_visible()
+        try:
+            return self._first_element.is_visible()
+        except Error as exc:
+            raise InvalidSelectorException(exc.message)
+
 
     def is_hidden(self, silent: bool = False) -> bool:
         """
@@ -507,7 +509,7 @@ class PlayElement(ElementABC, Logging, ABC):
         """
         Get the size of the current element, including width and height.
 
-        :return: :class:`Size` - An object representing the element's dimensions.
+        :return: :class:`.Size` - An object representing the element's dimensions.
         """
         box = self.element.first.bounding_box()
         return Size(width=box['width'], height=box['height'])

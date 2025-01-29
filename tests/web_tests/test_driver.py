@@ -4,6 +4,7 @@ from mops.base.driver_wrapper import DriverWrapper
 from tests.adata.pages.mouse_event_page import MouseEventPage
 from tests.adata.pages.pizza_order_page import PizzaOrderPage
 from tests.adata.pages.playground_main_page import SecondPlaygroundMainPage
+from tests.conftest import DESKTOP_WINDOW_SIZE
 
 
 @pytest.mark.skip_platform('chrome', 'firefox', reason='Test case is not relevant for current driver')
@@ -28,13 +29,35 @@ def test_is_firefox_driver(driver_wrapper):
 
 
 def test_driver_cookies(driver_wrapper, mouse_event_page):
-    driver_wrapper.set_cookie([{'name': 'sample_cookie', 'value': '123', 'path': '/', 'domain': 'http://example'}])
+    driver_wrapper.set_cookie(
+        [
+            {'name': 'sample_cookie', 'value': '123', 'path': '/', 'domain': '.customenv.github.io'}
+        ]
+    )
 
     actual_cookies_after_set = driver_wrapper.get_cookies()
     driver_wrapper.clear_cookies()
     actual_cookies_after_clear = driver_wrapper.get_cookies()
 
     assert all((actual_cookies_after_set, not actual_cookies_after_clear))
+
+
+def test_driver_delete_cookie(driver_wrapper, mouse_event_page):
+    cookie_name_1 = 'sample_cookie'
+    cookie_name_2 = 'another_cookie'
+    driver_wrapper.set_cookie(
+        [
+            {'name': cookie_name_1, 'value': '123', 'path': '/', 'domain': '.customenv.github.io'},
+            {'name': cookie_name_2, 'value': '321', 'path': '/', 'domain': '.customenv.github.io'},
+        ]
+    )
+    actual_cookies_after_set = driver_wrapper.get_cookies()
+    driver_wrapper.delete_cookie(cookie_name_2)
+    actual_cookies_after_clear = driver_wrapper.get_cookies()
+
+    assert len(actual_cookies_after_set) == 2
+    assert len(actual_cookies_after_clear) == 1
+    assert actual_cookies_after_clear[0]['name'] == cookie_name_1
 
 
 def test_driver_execute_script_set_and_get(driver_wrapper, mouse_event_page):
@@ -117,6 +140,25 @@ def test_second_driver_by_arg(driver_wrapper, second_driver_wrapper):
 def test_second_driver_compatibility(driver_wrapper, second_driver_wrapper):
     assert driver_wrapper.get_inner_window_size()
     assert second_driver_wrapper.get_inner_window_size()
+
+
+def test_get_inner_window_size(driver_wrapper):
+    inner_size = driver_wrapper.get_inner_window_size()
+    if driver_wrapper.is_desktop:
+        assert inner_size == DESKTOP_WINDOW_SIZE
+    elif driver_wrapper.is_mobile:
+        assert inner_size.width > 380
+        assert inner_size.height > 650
+    else:
+        raise Exception('Unexpected behaviour')
+
+
+@pytest.mark.skip_platform('android', 'ios', reason='Not relevant test case')
+def test_window_size(driver_wrapper):
+    inner_size = driver_wrapper.get_inner_window_size()
+    window_size = driver_wrapper.get_window_size()
+    assert inner_size.width <= window_size.width
+    assert inner_size.height <= window_size.height
 
 
 @pytest.mark.skip_platform('android', 'ios', reason='Appium doesnt support tabs creating')

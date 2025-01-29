@@ -8,8 +8,9 @@ import math
 import json
 import base64
 import importlib
+from dataclasses import astuple
 from urllib.parse import urljoin
-from typing import Union, List, Any, Tuple, Optional
+from typing import Union, List, Any, Tuple, Optional, TYPE_CHECKING
 from string import punctuation
 
 try:
@@ -21,30 +22,63 @@ from skimage._shared.utils import check_shape_equality  # noqa
 from skimage.metrics import structural_similarity
 from PIL import Image
 
+from mops.mixins.objects.size import Size
 from mops.exceptions import DriverWrapperException, TimeoutException
 from mops.js_scripts import add_element_over_js, delete_element_over_js
-from mops.mixins.objects.cut_box import CutBox
+from mops.mixins.objects.box import Box
 from mops.utils.logs import autolog
 from mops.mixins.internal_mixin import get_element_info
 
+if TYPE_CHECKING:
+    from mops.base.driver_wrapper import DriverWrapper
+    from mops.base.element import Element
+
 
 class VisualComparison:
+    """
+    A class for performing visual regression comparisons between screenshots.
 
-    visual_regression_path = ''
-    test_item = None
-    attach_diff_image_path = False
-    skip_screenshot_comparison = False
-    visual_reference_generation = False
-    hard_visual_reference_generation = False
-    soft_visual_reference_generation = False
-    default_delay = 0.75
-    default_threshold = 0
-    dynamic_threshold_factor = 0
-    diff_color_scheme = (0, 255, 0)
+    This class allows for managing visual regression settings, controlling the
+    generation and comparison of visual references, and customizing various aspects
+    of visual comparison, such as thresholds, delays, and the color scheme for diffs.
+    """
+
+    test_item: Any = None
+    """The pytest `request.node` object associated with the visual comparison."""
+
+    visual_regression_path: str = ''
+    """The path where visual regression images (reference, output, and diff) will be stored."""
+
+    attach_diff_image_path: bool = False
+    """Flag to determine whether to attach the diff image path to the report."""
+
+    skip_screenshot_comparison: bool = False
+    """If set to `True`, the screenshot comparison will be skipped."""
+
+    visual_reference_generation: bool = False
+    """Enables the generation of visual references."""
+
+    hard_visual_reference_generation: bool = False
+    """Forces the generation of visual references, replacing existing ones."""
+
+    soft_visual_reference_generation: bool = False
+    """Allows the generation of visual references only if they do not already exist."""
+
+    default_delay: Union[int, float] = 0.75
+    """The default delay before taking a screenshot."""
+
+    default_threshold: Union[int, float] = 0
+    """The default threshold for image comparison."""
+
+    dynamic_threshold_factor: int = 0
+    """A factor for dynamically calculating the threshold based on image size."""
+
+    diff_color_scheme: tuple = (0, 255, 0)
+    """The color scheme used for highlighting differences in images."""
 
     __initialized = False
 
-    def __init__(self, driver_wrapper, element=None):
+    def __init__(self, driver_wrapper: DriverWrapper, element: Element = None):
         self.driver_wrapper = driver_wrapper
         self.element_wrapper = element
         self.screenshot_name = 'default'
@@ -73,32 +107,6 @@ class VisualComparison:
 
         self.__initialized = True
 
-    def _save_screenshot(
-            self,
-            screenshot_name: str,
-            delay: Union[int, float],
-            remove: list,
-            fill_background: bool,
-            cut_box: Optional[CutBox],
-    ):
-        time.sleep(delay)
-
-        self._fill_background(fill_background)
-        self._appends_dummy_elements(remove)
-
-        if fill_background or remove:
-            time.sleep(0.1)
-
-        desired_obj = self.element_wrapper or self.driver_wrapper.anchor or self.driver_wrapper
-        image = desired_obj.screenshot_image()
-
-        if cut_box:
-            image = image.crop(cut_box.get_box(image.size))
-
-        desired_obj.save_screenshot(screenshot_name, screenshot_base=image)
-
-        self._remove_dummy_elements()
-
     def assert_screenshot(
             self,
             filename: str,
@@ -109,21 +117,30 @@ class VisualComparison:
             scroll: bool,
             remove: List[Any],
             fill_background: Union[str, bool],
-            cut_box: Optional[CutBox]
+            cut_box: Optional[Box]
     ) -> VisualComparison:
         """
-        Assert given (by name) and taken screenshot equals
+        Assert that the given (by name) and taken screenshots are equal.
 
-        :param filename: full screenshot name. Custom filename will be used if empty string given
-        :param test_name: test name for custom filename. Will try to find it automatically if empty string given
-        :param name_suffix: filename suffix. Good to use for same element with positive/negative case
-        :param threshold: possible threshold
-        :param delay: delay before taking screenshot
-        :param scroll: scroll to element before taking the screenshot
-        :param remove: remove elements from screenshot
-        :param fill_background: fill background with given color or black color by default
-        :param cut_box: custom coordinates, that will be cut from original image (left, top, right, bottom)
-        :return: self
+        :param filename: The full screenshot name. A custom filename will be used if an empty string is given.
+        :type filename: str
+        :param test_name: Test name for the custom filename. It will try to find it automatically if an empty string is given.
+        :type test_name: str
+        :param name_suffix: Filename suffix. Useful for the same element with positive/negative cases.
+        :type name_suffix: str
+        :param threshold: Possible threshold for image comparison.
+        :type threshold: float
+        :param delay: Delay before taking the screenshot.
+        :type delay: float
+        :param scroll: Whether to scroll to the element before taking the screenshot.
+        :type scroll: bool
+        :param remove: Whether to remove elements from the screenshot.
+        :type remove: bool
+        :param fill_background: Whether to fill the background with a given color or black by default.
+        :type fill_background: bool
+        :param cut_box: Custom coordinates to cut from the original image (left, top, right, bottom).
+        :type cut_box: :class:`.Box`
+        :return: :class:`VisualComparison`
         """
         if self.skip_screenshot_comparison:
             return self
@@ -160,7 +177,7 @@ class VisualComparison:
 
             self._attach_allure_diff(reference_file, reference_file, reference_file)
             raise AssertionError(f'Reference file "{reference_file}" not found, but its just saved. '
-                                 f'If it CI run, then you need to commit reference files.')
+                                 f'If it CI run, then you need to commit reference files.') from None
 
         if self.visual_reference_generation and not self.soft_visual_reference_generation:
             return self
@@ -199,6 +216,33 @@ class VisualComparison:
         pixels_allowed = int(pixels_grid / 100 * calculated_threshold)
         return calculated_threshold, \
             f'\nAdditional info: {width}x{height}; {calculated_threshold=}; {pixels_allowed=} from {pixels_grid}'
+
+    def _save_screenshot(
+            self,
+            screenshot_name: str,
+            delay: Union[int, float],
+            remove: list,
+            fill_background: bool,
+            cut_box: Optional[Box],
+    ):
+        time.sleep(delay)
+
+        self._fill_background(fill_background)
+        self._appends_dummy_elements(remove)
+
+        if fill_background or remove:
+            time.sleep(0.1)
+
+        desired_obj = self.element_wrapper or self.driver_wrapper.anchor or self.driver_wrapper
+        image = desired_obj.screenshot_image()
+
+        if cut_box:
+            image_size = Size(*image.size)
+            image = image.crop(astuple(cut_box.get_image_cut_box(image_size)))
+
+        desired_obj.save_screenshot(screenshot_name, screenshot_base=image)
+
+        self._remove_dummy_elements()
 
     def _appends_dummy_elements(self, remove_data: list) -> VisualComparison:
         """
@@ -269,14 +313,14 @@ class VisualComparison:
             check_shape_equality(reference_image, output_image)
         except ValueError:
             self._attach_allure_diff(actual_file, reference_file, actual_file)
-            # todo: watermark / fill size difference with color on diff image is better, but need more time
+            # TODO: watermark / fill size difference with color on diff image is better, but need more time
             # rescale output image to the size of reference image, and save it as diff image
             height, width, _ = reference_image.shape
             scaled_image = cv2.resize(output_image, (width, height))
             cv2.imwrite(diff_file, scaled_image)
             raise AssertionError(f"↓\nImage size (width, height) is not same for '{self.screenshot_name}':"
                                  f"\nExpected: {reference_image.shape[0:2]};"
-                                 f"\nActual: {output_image.shape[0:2]}.")
+                                 f"\nActual: {output_image.shape[0:2]}.") from None
 
         diff, actual_threshold = self._get_difference(reference_image, output_image, threshold)
         is_different = actual_threshold > threshold
@@ -295,7 +339,7 @@ class VisualComparison:
             raise AssertionError(f"{base_error}:"
                                  f"\nThreshold is: {actual_threshold};"
                                  f"\nPossible threshold is: {threshold}"
-                                 + additional_data)
+                                 + additional_data) from None
 
         return self
 

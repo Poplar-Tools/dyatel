@@ -1,15 +1,17 @@
 from __future__ import annotations
 
-from functools import cached_property
-from typing import Union, Type, List, Tuple, Any, TYPE_CHECKING
+from typing import Union, Type, List, Tuple, TYPE_CHECKING
 
 from PIL import Image
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
-from playwright.sync_api import Page as PlaywrightDriver
+from playwright.sync_api import (
+    Page as PlaywrightDriver,
+    Browser as PlaywrightBrowser,
+    BrowserContext as PlaywrightContext,
+)
 
-from mops.mixins.objects.cut_box import CutBox
-from mops.mixins.objects.size import Size
+from mops.mixins.objects.box import Box
 from mops.mixins.objects.driver import Driver
 from mops.visual_comparison import VisualComparison
 from mops.abstraction.driver_wrapper_abc import DriverWrapperABC
@@ -17,14 +19,13 @@ from mops.playwright.play_driver import PlayDriver
 from mops.selenium.driver.mobile_driver import MobileDriver
 from mops.selenium.driver.web_driver import WebDriver
 from mops.exceptions import DriverWrapperException
-from mops.js_scripts import get_inner_height_js, get_inner_width_js
 from mops.mixins.internal_mixin import InternalMixin
 from mops.utils.internal_utils import get_attributes_from_object, get_child_elements_with_names
 from mops.utils.logs import Logging, LogLevel
 
 
 if TYPE_CHECKING:
-    from mops.base.element import Element  # Import the concrete class for documentation purposes
+    from mops.base.element import Element
 
 
 class DriverWrapperSessions:
@@ -33,9 +34,9 @@ class DriverWrapperSessions:
     @classmethod
     def add_session(cls, driver_wrapper: DriverWrapper) -> None:
         """
-        Adds a :obj:`DriverWrapper` object to the session pool.
+        Adds a :obj:`.DriverWrapper` object to the session pool.
 
-        :param driver_wrapper: The :obj:`DriverWrapper` instance to add to the pool.
+        :param driver_wrapper: The :obj:`.DriverWrapper` instance to add to the pool.
         :return: None
         """
         cls.all_sessions.append(driver_wrapper)
@@ -43,9 +44,9 @@ class DriverWrapperSessions:
     @classmethod
     def remove_session(cls, driver_wrapper: DriverWrapper) -> None:
         """
-        Removes a :obj:`DriverWrapper` object from the session pool.
+        Removes a :obj:`.DriverWrapper` object from the session pool.
 
-        :param driver_wrapper: The :obj:`DriverWrapper` instance to remove from the pool.
+        :param driver_wrapper: The :obj:`.DriverWrapper` instance to remove from the pool.
         :return: None
         """
         cls.all_sessions.remove(driver_wrapper)
@@ -53,7 +54,7 @@ class DriverWrapperSessions:
     @classmethod
     def sessions_count(cls) -> int:
         """
-        Get the count of initialized :obj:`DriverWrapper` objects.
+        Get the count of initialized :obj:`.DriverWrapper` objects.
 
         :return: :obj:`int` - The number of initialized sessions.
         """
@@ -62,9 +63,9 @@ class DriverWrapperSessions:
     @classmethod
     def first_session(cls) -> Union[DriverWrapper, None]:
         """
-        Get the first :obj:`DriverWrapper` object from the session pool.
+        Get the first :obj:`.DriverWrapper` object from the session pool.
 
-        :return: The first :obj:`DriverWrapper` object in the pool, or `None` if no session exists.
+        :return: The first :obj:`.DriverWrapper` object in the pool, or `None` if no session exists.
         :rtype: typing.Union[DriverWrapper, None]
         """
         return cls.all_sessions[0] if cls.all_sessions else None
@@ -72,23 +73,32 @@ class DriverWrapperSessions:
     @classmethod
     def is_connected(cls) -> bool:
         """
-        Check the connection status of any :obj:`DriverWrapper` object in the pool.
+        Check the connection status of any :obj:`.DriverWrapper` object in the pool.
 
-        :return: :obj:`bool` - :obj:`True` if at least one :obj:`DriverWrapper` object is available,
+        :return: :obj:`bool` - :obj:`True` if at least one :obj:`.DriverWrapper` object is available,
           otherwise :obj:`False`.
         """
         return any(cls.all_sessions)
 
 
 class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
-    """ Driver object crossroad """
+    """
+    A wrapper class for managing web and mobile driver instances,
+    supporting Selenium, Appium, and Playwright.
+
+    This class serves as a crossroad for interacting with different driver types,
+    allowing for flexible management of web and mobile sessions.
+
+    It also provides platform-specific flags and information to assist with automation tasks.
+    """
+
+    driver: Union[SeleniumDriver, AppiumDriver, PlaywrightDriver]
+    context: PlaywrightContext
+    browser: PlaywrightBrowser
 
     _object: str = 'driver_wrapper'
     _base_cls: Type[PlayDriver, MobileDriver, WebDriver] = None
-
-    driver: Union[SeleniumDriver, AppiumDriver, PlaywrightDriver]
     session: DriverWrapperSessions = DriverWrapperSessions
-
     anchor: Union[Element, None] = None
 
     is_desktop: bool = False
@@ -137,9 +147,14 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
     def __init__(self, driver: Driver):
         """
-        Initializing of driver wrapper based on given driver source
+        Initializes the DriverWrapper instance based on the provided driver source.
 
-        :param driver: appium or selenium or playwright driver to initialize
+        This constructor sets up the driver wrapper, which can support
+        Appium, Selenium, or Playwright drivers.
+        It also manages session tracking and platform-specific configurations,
+        such as mobile resolution and platform type.
+
+        :param driver: :obj:`.Driver` object that holds appium / selenium / playwright driver to initialize
         """
         self.__driver_container = driver
         self.session.add_session(self)
@@ -174,17 +189,6 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
 
         self._base_cls.quit(self, trace_path)
         self.session.remove_session(self)
-
-    def get_inner_window_size(self) -> Size:
-        """
-        Retrieve the inner size of the driver window.
-
-        :return: :class:`Size` - An object representing the window's dimensions.
-        """
-        return Size(
-            height=self.execute_script(get_inner_height_js),
-            width=self.execute_script(get_inner_width_js)
-        )
 
     def save_screenshot(
             self,
@@ -223,9 +227,9 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             name_suffix: str = '',
             threshold: Union[int, float] = None,
             delay: Union[int, float] = None,
-            remove: Union[Any, List[Any]] = None,
-            cut_box: CutBox = None,
-            hide: Union[Any, List[Any]] = None,
+            remove: Union[Element, List[Element]] = None,
+            cut_box: Box = None,
+            hide: Union[Element, List[Element]] = None,
     ) -> None:
         """
         Asserts that the given screenshot matches the currently taken screenshot.
@@ -248,9 +252,9 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         :param remove: :class:`Element` to remove from the screenshot.
           Can be a single element or a list of elements.
         :type remove: typing.Optional[Element or typing.List[Element]]
-        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+        :param cut_box: A :class:`.Box` specifying a region to cut from the screenshot.
             If :obj:`None`, no region is cut.
-        :type cut_box: typing.Optional[CutBox]
+        :type cut_box: typing.Optional[Box]
         :param hide: :class:`Element` to hide in the screenshot.
           Can be a single element or a list of elements.
         :type hide: typing.Optional[Element or typing.List[Element]]
@@ -277,9 +281,9 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
             name_suffix: str = '',
             threshold: Union[int, float] = None,
             delay: Union[int, float] = None,
-            remove: Union[Any, List[Any]] = None,
-            cut_box: CutBox = None,
-            hide: Union[Any, List[Any]] = None,
+            remove: Union[Element, List[Element]] = None,
+            cut_box: Box = None,
+            hide: Union[Element, List[Element]] = None,
     ) -> Tuple[bool, str]:
         """
         Compares the currently taken screenshot to the expected screenshot and returns a result.
@@ -301,9 +305,9 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         :type delay: typing.Optional[int or float]
         :param remove: :class:`Element` to remove from the screenshot.
         :type remove: typing.Optional[Element or typing.List[Element]]
-        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+        :param cut_box: A :class:`.Box` specifying a region to cut from the screenshot.
             If :obj:`None`, no region is cut.
-        :type cut_box: typing.Optional[CutBox]
+        :type cut_box: typing.Optional[Box]
         :param hide: :class:`Element` to hide in the screenshot.
           Can be a single element or a list of elements.
         :return: :class:`typing.Tuple` (:class:`bool`, :class:`str`) - result state and result message

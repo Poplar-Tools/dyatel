@@ -4,7 +4,7 @@ import pytest
 import pytest_rerunfailures
 from mops.exceptions import UnexpectedElementsCountException
 
-from mops.mixins.objects.cut_box import CutBox
+from mops.mixins.objects.box import Box
 from mops.visual_comparison import VisualComparison
 from tests.adata.pages.playground_main_page import Card
 
@@ -30,7 +30,7 @@ def test_screenshot(base_playground_page, driver_name, platform, with_name):
 @pytest.mark.parametrize('is_percent', [True, False], ids=['percent value', 'digit value'])
 def test_screenshot_with_box(base_playground_page, driver_name, platform, left, top, right, bottom, is_percent):
     """ Task: 16053068 """
-    custom_box = CutBox(left, top, right, bottom, is_percents=is_percent)
+    custom_box = Box(left, top, right, bottom, is_percents=is_percent)
     if any([left, top, right, bottom]):
         base_playground_page.kube.scroll_into_view().assert_screenshot(cut_box=custom_box)
 
@@ -78,20 +78,6 @@ def test_screenshot_without_reference_and_rerun(base_playground_page, file, requ
             raise Exception('Unexpected behavior')
 
 
-@pytest.mark.low
-def test_screenshot_soft_assert(colored_blocks_page, request):
-    options = request.config.option
-
-    if options.sgr or options.hgr:
-        pytest.skip('Negative check from other test ref')
-
-    check, message = colored_blocks_page.row1.soft_assert_screenshot(
-        test_name=test_screenshot_fill_background_default.__name__
-    )
-
-    assert not check, message
-
-
 def test_screenshot_fill_background_blue(colored_blocks_page):
     colored_blocks_page.row1.assert_screenshot(fill_background='blue')
 
@@ -106,36 +92,23 @@ def test_append_dummy_elements_multiple_available(second_playground_page, driver
 
 
 def test_assert_screenshot_hide_elements(colored_blocks_page, driver_wrapper):
+    safe_call(lambda: colored_blocks_page.navbar.wait_elements_count(2), UnexpectedElementsCountException)
     all_cards = colored_blocks_page.get_all_cards()
     colored_blocks_page.row1.assert_screenshot(
         hide=all_cards[1],
         name_suffix='middle hidden',
-        delay=0.5
+        delay=0.5,
+        scroll=True,
     )
     driver_wrapper.refresh()
+
+    safe_call(lambda: colored_blocks_page.navbar.wait_elements_count(2), UnexpectedElementsCountException)
     all_cards = colored_blocks_page.get_all_cards()
     colored_blocks_page.row1.assert_screenshot(
         hide=[all_cards[0], all_cards[2]],
         name_suffix='sides hidden',
-        delay=0.5
-    )
-
-
-def test_assert_screenshot_hide_driver_elements(colored_blocks_page, driver_wrapper):
-    all_cards = colored_blocks_page.get_all_cards()
-    safe_call(lambda: colored_blocks_page.navbar.wait_elements_count(2), UnexpectedElementsCountException)
-    driver_wrapper.assert_screenshot(
-        hide=[all_cards[1]] + colored_blocks_page.navbar.all_elements,
-        name_suffix='middle hidden',
         delay=0.5,
-    )
-    driver_wrapper.refresh()
-    all_cards = colored_blocks_page.get_all_cards()
-    safe_call(lambda: colored_blocks_page.navbar.wait_elements_count(2), UnexpectedElementsCountException)
-    driver_wrapper.assert_screenshot(
-        hide=[all_cards[0], all_cards[2]] + colored_blocks_page.navbar.all_elements,
-        name_suffix='sides hidden',
-        delay=0.5,
+        scroll=True,
     )
 
 
@@ -191,3 +164,23 @@ def test_assert_screenshot_negative_missmatch(second_playground_page, driver_wra
         assert f"Visual mismatch found for '{filename}'" in str(exc)
     else:
         raise Exception('Unexpected behavior')
+
+
+def test_assert_screenshot_hide_driver_elements(colored_blocks_page, driver_wrapper):
+    safe_call(lambda: colored_blocks_page.navbar.wait_elements_count(2), UnexpectedElementsCountException)
+    all_cards = colored_blocks_page.get_all_cards()
+    all_cards[0].scroll_into_view()
+    driver_wrapper.assert_screenshot(
+        hide=[all_cards[1]] + colored_blocks_page.navbar.all_elements,
+        name_suffix='middle hidden',
+        delay=0.5,
+    )
+    driver_wrapper.refresh()
+    safe_call(lambda: colored_blocks_page.navbar.wait_elements_count(2), UnexpectedElementsCountException)
+    all_cards = colored_blocks_page.get_all_cards()
+    all_cards[0].scroll_into_view()
+    driver_wrapper.assert_screenshot(
+        hide=[all_cards[0], all_cards[2]] + colored_blocks_page.navbar.all_elements,
+        name_suffix='sides hidden',
+        delay=0.5,
+    )

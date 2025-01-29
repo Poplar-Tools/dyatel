@@ -35,6 +35,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
+    'sphinx.ext.viewcode',
 ]
 
 source_dirs = ['../../mops']
@@ -67,6 +68,9 @@ html_theme_options = {
     "dark_logo": "transparent_logo.png",
 }
 
+# sphinx.ext.viewcode
+# https://www.sphinx-doc.org/en/master/usage/extensions/viewcode.html
+viewcode_line_numbers = True  # Enable line numbers in the source code
 
 # -- Options for EPUB output
 epub_show_urls = 'footnote'

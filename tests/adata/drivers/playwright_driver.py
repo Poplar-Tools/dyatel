@@ -16,6 +16,7 @@ class PlaywrightDriver:
 
         context = cls._instance.new_context()
         driver = context.new_page()
+        context.set_default_timeout(10000)
 
         return Driver(driver=driver, context=context, instance=cls._instance)
 

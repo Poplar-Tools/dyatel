@@ -1,9 +1,8 @@
 name: Publish to PyPI
 
 on:
-  push:
-    branches:
-      - master
+  release:
+    types: [released]
 
 jobs:
   publish:
@@ -21,7 +20,9 @@ jobs:
           python-version: '3.8'
 
       - name: Build package
-        run: uv build
+        run: |
+          uv lock --upgrade-package mops
+          uv build
 
       - name: Publish package to PyPI
         run: |

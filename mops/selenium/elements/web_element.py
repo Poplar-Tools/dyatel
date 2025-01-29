@@ -1,25 +1,21 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import Union
 
 from mops.selenium.core.core_element import CoreElement
 from mops.js_scripts import js_click
-from mops.mixins.objects.locator import take_locator_type, Locator
 from mops.utils.internal_utils import calculate_coordinate_to_click
-from mops.utils.selector_synchronizer import get_platform_locator, get_selenium_locator_type
+from mops.utils.selector_synchronizer import get_platform_locator, set_selenium_selector
 
 
 class WebElement(CoreElement, ABC):
 
-    def __init__(self, locator: Union[Locator, str]):
+    def __init__(self):
         """
         Initializing of web element with selenium driver
-
-        :param locator: anchor locator of page. Can be defined without locator_type
         """
         self.locator = get_platform_locator(self)
-        self.locator_type = take_locator_type(locator) or get_selenium_locator_type(self.locator)
+        set_selenium_selector(self)
 
     def click(self, *, force_wait: bool = True, **kwargs) -> WebElement:
         """

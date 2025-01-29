@@ -11,6 +11,13 @@ jobs:
   screenshots_updating:
     runs-on: ubuntu-24.04
     steps:
+      - name: Check branch
+        run: |
+          if [ "${{ github.ref_name }}" == "master" ]; then
+            echo "This workflow is restricted to the 'master' branch."
+            exit 1
+          fi
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -38,8 +45,9 @@ jobs:
 
       - name: Commit changes
         run: |
+          WORKFLOW_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           git add .
-          git commit -m "Screenshots updated for ${{ github.event.inputs.commit_sha }}" || echo "No changes to commit"
+          git commit -m "Screenshots updated for ${{ github.event.inputs.commit_sha }}" -m "Workflow run: $WORKFLOW_URL" || echo "No changes to commit"
 
       - name: Set up Git for authentication
         run: |

@@ -38,7 +38,8 @@ def mocked_ios_driver(mocked_shared_mobile_driver):
         }
     )()
     driver_wrapper = MockedDriverWrapper(Driver(driver=mocked_shared_mobile_driver()))
-    return driver_wrapper
+    yield driver_wrapper
+    DriverWrapperSessions.all_sessions = []
 
 
 @pytest.fixture
@@ -51,7 +52,8 @@ def mocked_android_driver(mocked_shared_mobile_driver):
         }
     )()
     driver_wrapper = MockedDriverWrapper(Driver(driver=mocked_shared_mobile_driver()))
-    return driver_wrapper
+    yield driver_wrapper
+    DriverWrapperSessions.all_sessions = []
 
 
 @pytest.fixture
@@ -65,7 +67,8 @@ def mocked_ios_tablet_driver(mocked_shared_mobile_driver):
         }
     )()
     driver_wrapper = MockedDriverWrapper(Driver(driver=mocked_shared_mobile_driver()))
-    return driver_wrapper
+    yield driver_wrapper
+    DriverWrapperSessions.all_sessions = []
 
 
 @pytest.fixture
@@ -79,7 +82,8 @@ def mocked_android_tablet_driver(mocked_shared_mobile_driver):
         }
     )()
     driver_wrapper = MockedDriverWrapper(Driver(driver=mocked_shared_mobile_driver()))
-    return driver_wrapper
+    yield driver_wrapper
+    DriverWrapperSessions.all_sessions = []
 
 
 @pytest.fixture
@@ -92,7 +96,8 @@ def mocked_selenium_driver():
 
     selenium_driver.caps = {}
     driver_wrapper = MockedDriverWrapper(Driver(driver=selenium_driver()))
-    return driver_wrapper
+    yield driver_wrapper
+    DriverWrapperSessions.all_sessions = []
 
 
 @pytest.fixture
@@ -105,12 +110,12 @@ def mocked_selenium_mobile_driver():
 
     selenium_driver.caps = {}
     driver_wrapper = MockedDriverWrapper(Driver(driver=selenium_driver(), is_mobile_resolution=True))
-    return driver_wrapper
+    yield driver_wrapper
+    DriverWrapperSessions.all_sessions = []
 
 
 @pytest.fixture
 def mocked_play_driver():
-    PlayDriver.__init__ = MagicMock()
     driver_wrapper = MockedDriverWrapper(
         Driver(
             driver=PlaywrightSourcePage(MagicMock()),
@@ -118,12 +123,12 @@ def mocked_play_driver():
         )
     )
     driver_wrapper.is_desktop = True
-    return driver_wrapper
+    yield driver_wrapper
+    DriverWrapperSessions.all_sessions = []
 
 
 @pytest.fixture
 def mocked_play_mobile_driver():
-    PlayDriver.__init__ = MagicMock()
     driver_wrapper = MockedDriverWrapper(
         Driver(
             driver=PlaywrightSourcePage(MagicMock()),
@@ -131,7 +136,8 @@ def mocked_play_mobile_driver():
             is_mobile_resolution=True,
         )
     )
-    return driver_wrapper
+    yield driver_wrapper
+    DriverWrapperSessions.all_sessions = []
 
 
 @pytest.fixture(autouse=True)

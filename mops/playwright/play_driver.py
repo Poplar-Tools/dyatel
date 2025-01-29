@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from dataclasses import asdict
 from functools import cached_property
-from typing import List, Union, Any
+from typing import List, Union, Any, TYPE_CHECKING
 
 from playwright._impl._errors import Error as PlaywrightError  # noqa
 
@@ -10,9 +11,13 @@ from playwright.sync_api import Locator, Page, Browser, BrowserContext
 
 from mops.abstraction.driver_wrapper_abc import DriverWrapperABC
 from mops.mixins.objects.driver import Driver
+from mops.mixins.objects.size import Size
 from mops.shared_utils import get_image
 from mops.utils.internal_utils import get_timeout_in_ms, WAIT_UNIT
 from mops.utils.logs import Logging
+
+if TYPE_CHECKING:
+    from mops.base.element import Element
 
 
 class PlayDriver(Logging, DriverWrapperABC):
@@ -31,6 +36,8 @@ class PlayDriver(Logging, DriverWrapperABC):
 
         self.original_tab = self.driver
         self.browser_name = self.instance.browser_type.name
+
+        self._base_driver = self.driver
 
     @cached_property
     def is_safari(self) -> bool:
@@ -66,7 +73,7 @@ class PlayDriver(Logging, DriverWrapperABC):
         :param timeout: The time to sleep in seconds (can be an integer or float).
         :type timeout: typing.Union[int, float]
 
-        :return: :obj:`PlayDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.PlayDriver` - The current instance of the driver wrapper.
         """
         self.driver.wait_for_timeout(get_timeout_in_ms(timeout))
         return self
@@ -79,7 +86,7 @@ class PlayDriver(Logging, DriverWrapperABC):
         :type url: str
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
-        :return: :obj:`PlayDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.PlayDriver` - The current instance of the driver wrapper.
         """
         if not silent:
             self.log(f'Navigating to url {url}')
@@ -116,17 +123,17 @@ class PlayDriver(Logging, DriverWrapperABC):
         """
         Reload the current page.
 
-        :return: :obj:`PlayDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.PlayDriver` - The current instance of the driver wrapper.
         """
         self.log('Reload current page')
-        self.driver.reload()
+        self.driver.reload(wait_until='load')
         return self
 
     def go_forward(self) -> PlayDriver:
         """
         Navigate forward in the browser.
 
-        :return: :obj:`PlayDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.PlayDriver` - The current instance of the driver wrapper.
         """
         self.log('Going forward')
         self.driver.go_forward()
@@ -136,7 +143,7 @@ class PlayDriver(Logging, DriverWrapperABC):
         """
         Navigate backward in the browser.
 
-        :return: :obj:`PlayDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.PlayDriver` - The current instance of the driver wrapper.
         """
         self.log('Going back')
         self.driver.go_back()
@@ -167,7 +174,7 @@ class PlayDriver(Logging, DriverWrapperABC):
             except PlaywrightError:
                 pass
 
-        self.driver.close()
+        self._base_driver.close()
         self.context.close()
 
     def set_cookie(self, cookies: List[dict]) -> PlayDriver:
@@ -178,7 +185,7 @@ class PlayDriver(Logging, DriverWrapperABC):
 
         :param cookies: A list of dictionaries, each containing cookie data.
         :type cookies: typing.List[dict]
-        :return: :obj:`PlayDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.PlayDriver` - The current instance of the driver wrapper.
         """
         for cookie in cookies:
 
@@ -195,9 +202,18 @@ class PlayDriver(Logging, DriverWrapperABC):
         """
         Delete all cookies in the current session.
 
-        :return: :obj:`PlayDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.PlayDriver` - The current instance of the driver wrapper.
         """
         self.context.clear_cookies()
+        return self
+
+    def delete_cookie(self, name: str) -> PlayDriver:
+        """
+        Delete a cookie by name.
+
+        :return: :obj:`.PlayDriver` - The current instance of the driver wrapper.
+        """
+        self.context.clear_cookies(name=name)
         return self
 
     def get_cookies(self) -> List[dict]:
@@ -208,6 +224,26 @@ class PlayDriver(Logging, DriverWrapperABC):
         :rtype: typing.List[typing.Dict]
         """
         return self.context.cookies()
+
+    def switch_to_frame(self, frame: Element) -> PlayDriver:
+        """
+        Switch to a specified frame.
+
+        :param frame: The frame element to switch to.
+        :type frame: Element
+        :return: :obj:`.PlayDriver` - The current instance of the driver wrapper.
+        """
+        self.driver = frame.element.content_frame
+        return self
+
+    def switch_to_default_content(self) -> PlayDriver:
+        """
+        Switch back to the default content from a frame.
+
+        :return: :obj:`.PlayDriver` - The current instance of the driver wrapper.
+        """
+        self.driver = self._base_driver
+        return self
 
     def execute_script(self, script: str, *args) -> Any:
         """
@@ -250,23 +286,44 @@ class PlayDriver(Logging, DriverWrapperABC):
 
         :param timeout: The timeout duration to set, in seconds.
         :type timeout: int
-        :return: :obj:`PlayDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.PlayDriver` - The current instance of the driver wrapper.
         """
         self.driver.set_default_navigation_timeout(get_timeout_in_ms(timeout))
         return self
 
-    def set_window_size(self, width: int, height: int) -> PlayDriver:
+    def set_window_size(self, size: Size) -> PlayDriver:
         """
-        Set the width and height of the current window.
+        Set the inner window size (viewport) of the current browser context.
 
-        :param width: The width, in pixels, to set the window to.
-        :type width: int
-        :param height: The height, in pixels, to set the window to.
-        :type height: int
-        :return: :obj:`PlayDriver` - The current instance of the driver wrapper.
+        :param size: The desired inner window size as a :class:`.Size` object.
+        :return: The current instance of :obj:`.PlayDriver`.
         """
-        self.driver.set_viewport_size({'width': width, 'height': height})
+        self.driver.set_viewport_size(asdict(size))
         return self
+
+    def get_inner_window_size(self) -> Size:
+        """
+        Retrieve the inner window size (viewport) of the current browser context.
+
+        :return: The size of the inner window as a :class:`.Size` object.
+        """
+        return Size(**self.driver.viewport_size)
+
+    def get_window_size(self) -> Size:
+        """
+        Retrieve the outer window size of the current browser context.
+
+        .. note::
+            Playwright behaves differently in headless mode, where the reported window
+             size may not reflect the actual dimensions.
+            In contrast, Appium does not support retrieving the window size in the
+             same way as traditional web browsers.
+
+        :return: The size of the outer window as a :class:`.Size` object.
+        """
+        width = self.execute_script('return window.outerWidth')
+        height = self.execute_script('return window.outerHeight')
+        return Size(width=width, height=height)
 
     def screenshot_image(self, screenshot_base: bytes = None) -> Image:
         """
@@ -303,7 +360,7 @@ class PlayDriver(Logging, DriverWrapperABC):
         """
         Selenium/Playwright only: Create a new tab and switch to it.
 
-        :return: :obj:`PlayDriver` - The current instance of the driver wrapper, now switched to the new tab.
+        :return: :obj:`.PlayDriver` - The current instance of the driver wrapper, now switched to the new tab.
         """
         with self.context.expect_page() as new_page:
             self.execute_script("window.open(arguments[0], '_blank').focus();", self.current_url)
@@ -315,7 +372,7 @@ class PlayDriver(Logging, DriverWrapperABC):
         """
         Selenium/Playwright only: Switch back to the original tab.
 
-        :return: :obj:`PlayDriver` - The current instance of the driver wrapper, now switched to the original tab.
+        :return: :obj:`.PlayDriver` - The current instance of the driver wrapper, now switched to the original tab.
         """
         self.driver = self.original_tab
         self.driver.bring_to_front()
@@ -327,7 +384,7 @@ class PlayDriver(Logging, DriverWrapperABC):
 
         :param tab: The index of the tab to switch to, starting from 1. Default is the latest tab.
         :type tab: int
-        :return: :obj:`PlayDriver` - The current instance of the driver wrapper, now switched to the specified tab.
+        :return: :obj:`.PlayDriver` - The current instance of the driver wrapper, now switched to the specified tab.
         """
         if tab == -1:
             tab = self.get_all_tabs()[tab]
@@ -342,7 +399,7 @@ class PlayDriver(Logging, DriverWrapperABC):
         """
         Selenium/Playwright only: Close all tabs except the original.
 
-        :return: :obj:`PlayDriver` - The current instance of the driver wrapper,
+        :return: :obj:`.PlayDriver` - The current instance of the driver wrapper,
           with all tabs except the original closed.
         """
         tabs = self.get_all_tabs()
@@ -363,7 +420,7 @@ class PlayDriver(Logging, DriverWrapperABC):
         :type y: int
         :param silent: If :obj:`True`, suppresses the log message. Default is :obj:`False`.
         :type silent: bool
-        :return: :obj:`PlayDriver` - The current instance of the driver wrapper.
+        :return: :obj:`.PlayDriver` - The current instance of the driver wrapper.
         """
         if not silent:
             self.log(f'Click by given coordinates (x: {x}, y: {y})')

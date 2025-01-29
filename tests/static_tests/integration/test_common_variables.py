@@ -2,10 +2,7 @@ import pytest
 from selenium.webdriver.common.by import By
 
 from mops.base.element import Element
-from mops.base.page import Page
 from mops.mixins.objects.locator import Locator
-from mops.utils.selector_synchronizer import selenium_locator_types
-from mops.exceptions import InvalidSelectorException
 from mops.utils.internal_utils import all_tags
 from tests.static_tests.conftest import selenium_ids, selenium_drivers, all_drivers, all_ids
 
@@ -21,7 +18,7 @@ def test_base_class_auto_css_locator(locator, request, driver):
 
 @pytest.mark.parametrize('locator', tags)
 def test_base_class_auto_tag_name_locator(locator, mocked_selenium_driver):
-    assert Element(locator).locator_type == By.TAG_NAME
+    assert Element(locator).locator_type == By.CSS_SELECTOR
 
 
 @pytest.mark.parametrize('locator', tags)
@@ -38,7 +35,7 @@ def test_base_class_auto_xpath_locator(locator, driver, request):
 
 @pytest.mark.parametrize('locator', ('some-id', 'example__of--id'))
 def test_base_class_auto_id_locator_web(locator, mocked_selenium_driver):
-    assert Element(locator).locator_type == By.ID
+    assert Element(locator).locator_type == By.CSS_SELECTOR
 
 
 @pytest.mark.parametrize('locator', ('some-id', 'example__of--id', 'com.android.chrome:id/bottom_container'))
@@ -49,17 +46,17 @@ def test_base_class_auto_id_locator_mobile(locator, mocked_android_driver):
 @pytest.mark.parametrize('driver', selenium_drivers, ids=selenium_ids)
 def test_specify_css_locator_type(request, driver):
     request.getfixturevalue(driver)
-    assert Element(Locator('[href="/loaddelay"]', By.CSS_SELECTOR)).locator_type == By.CSS_SELECTOR
+    assert Element(Locator('[href="/loaddelay"]')).locator_type == By.CSS_SELECTOR
 
 
 @pytest.mark.parametrize('locator', tags)
 def test_specify_class_name_locator_type_mobile(locator, mocked_selenium_driver):
-    assert Element(Locator(locator, By.CLASS_NAME)).locator_type == By.CLASS_NAME
+    assert Element(Locator(locator)).locator_type == By.CSS_SELECTOR
 
 
 @pytest.mark.parametrize('locator', tags)
 def test_specify_class_name_locator_type_web(locator, mocked_android_driver):
-    assert Element(locator, By.CLASS_NAME).locator_type == By.CSS_SELECTOR
+    assert Element(locator).locator_type == By.CSS_SELECTOR
 
 
 @pytest.mark.parametrize('driver', selenium_drivers, ids=selenium_ids)
@@ -74,27 +71,3 @@ def test_name_specified(request, driver):
     request.getfixturevalue(driver)
     locator, name = '.sample .locator', 'sample name'
     assert Element(locator, name=name).name == name
-
-
-@pytest.mark.parametrize('locator_type', selenium_locator_types)
-@pytest.mark.parametrize('driver', selenium_drivers, ids=selenium_ids)
-def test_locator_type_given_instead_of_locator_element(locator_type, request, driver):
-    request.getfixturevalue(driver)
-    try:
-        Element(locator_type)
-    except InvalidSelectorException:
-        pass
-    else:
-        raise Exception('Unexpected behavior')
-
-
-@pytest.mark.parametrize('locator_type', selenium_locator_types)
-@pytest.mark.parametrize('driver', selenium_drivers, ids=selenium_ids)
-def test_locator_type_given_instead_of_locator_page(locator_type, request, driver):
-    request.getfixturevalue(driver)
-    try:
-        Page(locator_type).anchor  # noqa
-    except InvalidSelectorException:
-        pass
-    else:
-        raise Exception('Unexpected behavior')

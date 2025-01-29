@@ -6,7 +6,7 @@ from typing import List, Union, Any, Tuple, TYPE_CHECKING
 
 from playwright.sync_api import Page as PlaywrightPage
 
-from mops.mixins.objects.cut_box import CutBox
+from mops.mixins.objects.box import Box
 from selenium.webdriver.common.alert import Alert
 from PIL import Image
 
@@ -95,14 +95,6 @@ class DriverWrapperABC(ABC):
         """
         raise NotImplementedError()
 
-    def get_inner_window_size(self) -> Size:
-        """
-        Retrieve the inner size of the driver window.
-
-        :return: :class:`Size` - An object representing the window's dimensions.
-        """
-        raise NotImplementedError()
-
     def wait(self, timeout: Union[int, float] = WAIT_UNIT) -> DriverWrapper:
         """
         Pauses the execution for a specified amount of time.
@@ -110,7 +102,7 @@ class DriverWrapperABC(ABC):
         :param timeout: The time to sleep in seconds (can be an integer or float).
         :type timeout: typing.Union[int, float]
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -122,7 +114,7 @@ class DriverWrapperABC(ABC):
         :type url: str
         :param silent: If :obj:`True`, suppresses logging.
         :type silent: bool
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -155,7 +147,7 @@ class DriverWrapperABC(ABC):
         """
         Reload the current page.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -163,7 +155,7 @@ class DriverWrapperABC(ABC):
         """
         Navigate forward in the browser.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -171,7 +163,7 @@ class DriverWrapperABC(ABC):
         """
         Navigate backward in the browser.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -183,7 +175,7 @@ class DriverWrapperABC(ABC):
 
         :param cookies: A list of dictionaries, each containing cookie data.
         :type cookies: typing.List[dict]
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -191,20 +183,15 @@ class DriverWrapperABC(ABC):
         """
         Delete all cookies in the current session.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
     def delete_cookie(self, name: str) -> DriverWrapper:
         """
-        Appium/Selenium only: Delete a cookie by name.
+        Delete a cookie by name.
 
-        Note: Playwright does not support deleting specific cookies:
-            https://github.com/microsoft/playwright/issues/10143
-
-            Todo: Fixed in playwright 1.43.0
-
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -219,19 +206,19 @@ class DriverWrapperABC(ABC):
 
     def switch_to_frame(self, frame: Element) -> DriverWrapper:
         """
-        Appium/Selenium only: Switch to a specified frame.
+        Switch to a specified frame.
 
         :param frame: The frame element to switch to.
         :type frame: Element
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
     def switch_to_default_content(self) -> DriverWrapper:
         """
-        Appium/Selenium only: Switch back to the default content from a frame.
+        Switch back to the default content from a frame.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -266,19 +253,38 @@ class DriverWrapperABC(ABC):
 
         :param timeout: The timeout duration to set, in seconds.
         :type timeout: int
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
-    def set_window_size(self, width: int, height: int) -> DriverWrapper:
+    def set_window_size(self, size: Size) -> DriverWrapper:
         """
-        Set the width and height of the current window.
+        Set the inner window size (viewport) of the current browser context.
 
-        :param width: The width, in pixels, to set the window to.
-        :type width: int
-        :param height: The height, in pixels, to set the window to.
-        :type height: int
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :param size: The desired inner window size as a :class:`.Size` object.
+        :return: The current instance of :obj:`.DriverWrapper`.
+        """
+        raise NotImplementedError()
+
+    def get_inner_window_size(self) -> Size:
+        """
+        Retrieve the inner window size (viewport) of the current browser context.
+
+        :return: The size of the inner window as a :class:`.Size` object.
+        """
+        raise NotImplementedError()
+
+    def get_window_size(self) -> Size:
+        """
+        Retrieve the outer window size of the current browser context.
+
+        .. note::
+            Playwright behaves differently in headless mode, where the reported window
+             size may not reflect the actual dimensions.
+            In contrast, Appium does not support retrieving the window size in the
+             same way as traditional web browsers.
+
+        :return: The size of the outer window as a :class:`.Size` object.
         """
         raise NotImplementedError()
 
@@ -308,9 +314,9 @@ class DriverWrapperABC(ABC):
             name_suffix: str = '',
             threshold: Union[int, float] = None,
             delay: Union[int, float] = None,
-            remove: Union[Any, List[Any]] = None,
-            cut_box: CutBox = None,
-            hide: Union[Any, List[Any]] = None,
+            remove: Union[Element, List[Element]] = None,
+            cut_box: Box = None,
+            hide: Union[Element, List[Element]] = None,
     ) -> None:
         """
         Asserts that the given screenshot matches the currently taken screenshot.
@@ -333,9 +339,9 @@ class DriverWrapperABC(ABC):
         :param remove: :class:`Element` to remove from the screenshot.
           Can be a single element or a list of elements.
         :type remove: typing.Optional[Element or typing.List[Element]]
-        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+        :param cut_box: A :class:`.Box` specifying a region to cut from the screenshot.
             If :obj:`None`, no region is cut.
-        :type cut_box: typing.Optional[CutBox]
+        :type cut_box: typing.Optional[Box]
         :param hide: :class:`Element` to hide in the screenshot.
           Can be a single element or a list of elements.
         :type hide: typing.Optional[Element or typing.List[Element]]
@@ -350,9 +356,9 @@ class DriverWrapperABC(ABC):
             name_suffix: str = '',
             threshold: Union[int, float] = None,
             delay: Union[int, float] = None,
-            remove: Union[Any, List[Any]] = None,
-            cut_box: CutBox = None,
-            hide: Union[Any, List[Any]] = None,
+            remove: Union[Element, List[Element]] = None,
+            cut_box: Box = None,
+            hide: Union[Element, List[Element]] = None,
     ) -> Tuple[bool, str]:
         """
         Compares the currently taken screenshot to the expected screenshot and returns a result.
@@ -374,9 +380,9 @@ class DriverWrapperABC(ABC):
         :type delay: typing.Optional[int or float]
         :param remove: :class:`Element` to remove from the screenshot.
         :type remove: typing.Optional[Element or typing.List[Element]]
-        :param cut_box: A `CutBox` specifying a region to cut from the screenshot.
+        :param cut_box: A :class:`.Box` specifying a region to cut from the screenshot.
             If :obj:`None`, no region is cut.
-        :type cut_box: typing.Optional[CutBox]
+        :type cut_box: typing.Optional[Box]
         :param hide: :class:`Element` to hide in the screenshot.
           Can be a single element or a list of elements.
         :return: :class:`typing.Tuple` (:class:`bool`, :class:`str`) - result state and result message
@@ -417,7 +423,7 @@ class DriverWrapperABC(ABC):
         """
         Selenium/Playwright only: Create a new tab and switch to it.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper, now switched to the new tab.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper, now switched to the new tab.
         """
         raise NotImplementedError()
 
@@ -425,7 +431,7 @@ class DriverWrapperABC(ABC):
         """
         Selenium/Playwright only: Switch back to the original tab.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper, now switched to the original tab.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper, now switched to the original tab.
         """
         raise NotImplementedError()
 
@@ -435,7 +441,7 @@ class DriverWrapperABC(ABC):
 
         :param tab: The index of the tab to switch to, starting from 1. Default is the latest tab.
         :type tab: int
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper, now switched to the specified tab.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper, now switched to the specified tab.
         """
         raise NotImplementedError()
 
@@ -443,7 +449,7 @@ class DriverWrapperABC(ABC):
         """
         Selenium/Playwright only: Close all tabs except the original.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper,
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper,
           with all tabs except the original closed.
         """
         raise NotImplementedError()
@@ -458,7 +464,7 @@ class DriverWrapperABC(ABC):
         :type y: int
         :param silent: If :obj:`True`, suppresses the log message. Default is :obj:`False`.
         :type silent: bool
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -516,7 +522,7 @@ class DriverWrapperABC(ABC):
         """
         Appium only: Switch to the native app context.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper, now in the native app context.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper, now in the native app context.
         """
         raise NotImplementedError()
 
@@ -524,7 +530,7 @@ class DriverWrapperABC(ABC):
         """
         Appium only: Switch to the web app context.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper, now in the web app context.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper, now in the web app context.
         """
         raise NotImplementedError()
 
@@ -575,7 +581,7 @@ class DriverWrapperABC(ABC):
         Appium only: Hide the keyboard on a real device.
 
         :param kwargs: Additional arguments passed to the `Keyboard.hide_keyboard` method.
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -611,7 +617,7 @@ class DriverWrapperABC(ABC):
         """
         Appium/Selenium only: Wait for an alert, switch to it, and click accept.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
@@ -619,7 +625,7 @@ class DriverWrapperABC(ABC):
         """
         Appium/Selenium only: Wait for an alert, switch to it, and click dismiss.
 
-        :return: :obj:`DriverWrapper` - The current instance of the driver wrapper.
+        :return: :obj:`.DriverWrapper` - The current instance of the driver wrapper.
         """
         raise NotImplementedError()
 
