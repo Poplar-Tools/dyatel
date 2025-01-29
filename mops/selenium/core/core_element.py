@@ -2,9 +2,11 @@ from __future__ import annotations
 
 import time
 from abc import ABC
-from typing import Union, List, Any, Callable
+from typing import Union, List, Any, Callable, TYPE_CHECKING
 
 from PIL import Image
+
+from mops.mixins.internal_mixin import get_element_info
 from mops.mixins.objects.wait_result import Result
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumWebDriver
 from selenium.webdriver.remote.webelement import WebElement as SeleniumWebElement
@@ -18,16 +20,15 @@ from selenium.common.exceptions import (
     ElementClickInterceptedException as SeleniumElementClickInterceptedException,
     StaleElementReferenceException as SeleniumStaleElementReferenceException,
 )
-
 from mops.abstraction.element_abc import ElementABC
 from mops.selenium.sel_utils import ActionChains
-from mops.js_scripts import get_element_size_js, get_element_position_on_screen_js, js_click
+from mops.js_scripts import get_element_size_js, get_element_position_on_screen_js
 from mops.keyboard_keys import KeyboardKeys
 from mops.mixins.objects.location import Location
 from mops.mixins.objects.scrolls import ScrollTo, ScrollTypes, scroll_into_view_blocks
 from mops.mixins.objects.size import Size
 from mops.shared_utils import cut_log_data, _scaled_screenshot
-from mops.utils.internal_utils import WAIT_EL, safe_call, get_dict, HALF_WAIT_EL, wait_condition
+from mops.utils.internal_utils import WAIT_EL, safe_call, get_dict, HALF_WAIT_EL, wait_condition, is_group
 from mops.exceptions import (
     TimeoutException,
     InvalidSelectorException,
@@ -37,10 +38,14 @@ from mops.exceptions import (
     NoSuchParentException,
 )
 
+if TYPE_CHECKING:
+    from mops.base.element import Element
+
 
 class CoreElement(ElementABC, ABC):
 
-    parent: Union[ElementABC, CoreElement]
+    parent: Union[Element]
+    locator_type: str
     _element: Union[None, SeleniumWebElement, AppiumWebElement] = None
     _cached_element: Union[None, SeleniumWebElement, AppiumWebElement] = None
 
@@ -393,7 +398,7 @@ class CoreElement(ElementABC, ABC):
         try:
             element = safe_call(self._find_element, wait_parent=False)
         except SeleniumInvalidSelectorException as exc:
-            raise InvalidSelectorException(exc.msg) from None
+            raise InvalidSelectorException(exc.msg)
 
         return bool(element)
 
@@ -561,13 +566,17 @@ class CoreElement(ElementABC, ABC):
                 element = self._get_cached_element(safe_call(wait, silent=True))
 
         if not element:
+            element_info = f'"{self.name}" {self.__class__.__name__}'
             if self.parent and not self._get_cached_element(self.parent):
                 raise NoSuchParentException(
-                    f'Cant find parent object "{self.parent.name}". {self.get_element_info(self.parent)}'  # noqa
+                    f'{self._get_container_info()} container not found while accessing {element_info}. '
+                    f'{get_element_info(self.parent, "Container Selector=")}'
                 )
 
             raise NoSuchElementException(
-                f'Cant find element "{self.name}". {self.get_element_info()}{self._ensure_unique_parent()}'
+                f'Unable to locate the {element_info}. '
+                f'{self.get_element_info()}'
+                f'{self._ensure_unique_parent()}'
             )
 
         return element
@@ -644,6 +653,13 @@ class CoreElement(ElementABC, ABC):
         else:
             raise exc
 
+    def _get_container_info(self) -> str:
+        container_info = f'"{self.parent.name}"'
+        if is_group(self.parent):
+            container_info = self.parent.__class__.__name__
+
+        return container_info
+
     def _ensure_unique_parent(self) -> str:
         """
         Ensure that parent is unique and give information if it isn't
@@ -654,11 +670,11 @@ class CoreElement(ElementABC, ABC):
         if self.parent:
             parents_count = len(self.parent._find_elements())
             if parents_count > 1:
-                info = f'\nWARNING: The parent object is not unique, count of parent elements are: {parents_count}'
+                info = f'\nWARNING: Located {parents_count} elements for {self._get_container_info()} container'
 
         return info
 
-    def _get_cached_element(self, obj: CoreElement) -> Union[None, SeleniumWebElement, AppiumWebElement]:
+    def _get_cached_element(self, obj: Union[CoreElement, Element]) -> Union[None, SeleniumWebElement, AppiumWebElement]:
         """
         Get cached element from given object
 

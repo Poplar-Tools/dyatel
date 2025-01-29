@@ -1,7 +1,9 @@
 import pytest
 
+from mops.base.element import Element
 from mops.exceptions import *
 from mops.mixins.objects.size import Size
+from tests.adata.pages.expected_condition_page import ExpectedConditionPage
 
 timeout = 0.1
 
@@ -102,6 +104,53 @@ def test_wait_element_visible_error_msg(forms_page):
     except TimeoutException as exc:
         assert f'"invalid element" not visible after {timeout} seconds.' in exc.msg
         assert """Selector='xpath=//*[contains(@class, "card") and .//.="Basic Form Controls"] >> id=data'""" in exc.msg
+    else:
+        raise Exception('Unexpected behaviour')
+
+
+@pytest.mark.medium
+@pytest.mark.skip_platform('playwright', reason='selenium only')
+def test_get_container_error_msg(forms_page):
+    try:
+        ExpectedConditionPage().value_card.trigger_button._get_element(wait=False)
+    except NoSuchParentException as exc:
+        assert """WaitValueCard container not found while accessing "trigger wait button" Element. Container Selector='xpath=//*[contains(@class, "card") and contains(., "Wait for text")]'""" == exc.msg
+    else:
+        raise Exception('Unexpected behaviour')
+
+
+@pytest.mark.medium
+@pytest.mark.skip_platform('playwright', reason='selenium only')
+def test_get_element_error_msg(forms_page):
+    try:
+        Element('some_element')._get_element(wait=False)
+    except NoSuchElementException as exc:
+        assert """Unable to locate the "some_element" Element. Selector='id=some_element'""" == exc.msg
+    else:
+        raise Exception('Unexpected behaviour')
+
+
+@pytest.mark.medium
+@pytest.mark.skip_platform('playwright', reason='selenium only')
+def test_get_element_with_element_container_error_msg(forms_page):
+    try:
+        container = Element(forms_page.controls_form.locator, name='another element as container')
+        Element('some_element', parent=container)._get_element(wait=False)
+    except NoSuchElementException as exc:
+        assert """Unable to locate the "some_element" Element. Selector='xpath=//*[contains(@class, "card") and .//.="Basic Form Controls"] >> id=some_element'""" in exc.msg, exc.msg
+        assert """WARNING: Located 2 elements for "another element as container" container""" in exc.msg, exc.msg
+    else:
+        raise Exception('Unexpected behaviour')
+
+
+@pytest.mark.medium
+@pytest.mark.skip_platform('playwright', reason='selenium only')
+def test_get_element_with_container_error_msg(forms_page):
+    try:
+        forms_page.controls_form.broken_input._get_element(wait=False)
+    except NoSuchElementException as exc:
+        assert """Unable to locate the "invalid element" Element. Selector='xpath=//*[contains(@class, "card") and .//.="Basic Form Controls"] >> id=data'""" in exc.msg
+        assert """WARNING: Located 2 elements for ControlsForm container""" in exc.msg
     else:
         raise Exception('Unexpected behaviour')
 

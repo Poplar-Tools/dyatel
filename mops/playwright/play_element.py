@@ -438,7 +438,7 @@ class PlayElement(ElementABC, Logging, ABC):
         try:
             return self._first_element.is_visible()
         except Error as exc:
-            raise InvalidSelectorException(exc.message) from None
+            raise InvalidSelectorException(exc.message)
 
 
     def is_hidden(self, silent: bool = False) -> bool:

@@ -4,56 +4,9 @@ import random
 import pytest
 
 from mops.base.element import Element
-from mops.mixins.internal_mixin import get_element_info
 from tests.adata.pages.expected_condition_page import WaitValueCardBroken
-from mops.exceptions import NoSuchElementException, NoSuchParentException, InvalidSelectorException
+from mops.exceptions import InvalidSelectorException
 from tests.adata.pages.keyboard_page import KeyboardPage
-
-
-@pytest.mark.skip_platform(
-    'playwright',
-    reason='Playwright doesnt throw error if element/parent isn\'t available/broken'
-)
-def test_element_exception_without_parent(base_playground_page):
-    el = base_playground_page.kube_broken
-    try:
-        el._get_element(wait=False)
-    except NoSuchElementException as exc:
-        logs = get_element_info(el)
-        message = f'Cant find element "{el.name}". {logs}'
-        assert exc.msg == message
-    else:
-        raise Exception('Unexpected behaviour')
-
-
-@pytest.mark.skip_platform(
-    'playwright',
-    reason='Playwright doesnt throw error if element/parent isn\'t available/broken'
-)
-def test_element_exception_with_broken_parent(base_playground_page):
-    el = base_playground_page.kube_broken_parent
-    try:
-        el._get_element(wait=False)
-    except NoSuchParentException as exc:
-        logs = get_element_info(el.parent)
-        message = f'Cant find parent object "{el.parent.name}". {logs}'
-        assert exc.msg == message
-    else:
-        raise Exception('Unexpected behaviour')
-
-
-@pytest.mark.skip_platform(
-    'playwright',
-    reason='Playwright handle these cases and does not throw some Exceptions in such cases'
-)
-def test_multiple_parents_found_negative(expected_condition_page):
-    """ Check that warning with count of parent elements added to NoSuchElementException """
-    try:
-        WaitValueCardBroken().trigger_button._get_element(wait=False)
-    except NoSuchElementException as exc:
-        assert 'WARNING: The parent object is not unique, count of parent elements are: 8' in exc.msg
-    else:
-        raise Exception('Unexpected behaviour')
 
 
 @pytest.mark.skip_platform(
