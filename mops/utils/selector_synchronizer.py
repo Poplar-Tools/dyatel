@@ -143,6 +143,8 @@ def set_appium_selector(obj: Any):
     """
     Sets appium locator & locator type
     """
+    set_selenium_selector(obj)
+
     locator = obj.locator.strip()
 
     # Mobile com.android selector

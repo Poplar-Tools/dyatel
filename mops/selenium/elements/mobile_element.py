@@ -19,7 +19,6 @@ class MobileElement(CoreElement, ABC):
         Initializing of mobile element with appium driver
         """
         self.locator = get_platform_locator(self)
-        set_selenium_selector(self)
         set_appium_selector(self)
 
     def click_outside(self, x: int = -5, y: int = -5) -> MobileElement:

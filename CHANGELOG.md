@@ -3,7 +3,7 @@
 <br>
 
 ## v3.1.0
-*Release date: 2025-01-28*
+*Release date: 2025-01-29*
 
 ### Added
 - [Kitchen Sink](https://mops.readthedocs.io/3.1.0/kitchen_sink/index.html) section on ReadTheDocs
