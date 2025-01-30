@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Union, Any, List, Type
+from typing import Union, Any, Type
 
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
@@ -22,7 +22,6 @@ from mops.utils.internal_utils import (
     WAIT_PAGE,
     initialize_objects,
     get_child_elements_with_names,
-    get_child_elements,
     is_element_instance,
 )
 
@@ -86,8 +85,6 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
         self._modify_page_driver_wrapper(driver_wrapper)
         self._modify_sub_elements()
         self._safe_setter('__base_obj_id', id(self))
-
-        self.page_elements: List[Element] = get_child_elements(self, Element)
 
         self.__init_base_class__()
 
@@ -159,7 +156,7 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
 
         self.anchor.wait_visibility(timeout=timeout, silent=True)
 
-        for element in self.page_elements:
+        for element in self.sub_elements.values():
             if getattr(element, 'wait') is False:
                 element.wait_hidden(timeout=timeout, silent=True)
             elif getattr(element, 'wait') is True:
@@ -179,7 +176,7 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
         result = True
 
         if with_elements:
-            for element in self.page_elements:
+            for element in self.sub_elements.values():
                 if getattr(element, 'wait'):
                     result &= element.is_displayed(silent=True)
                     if not result:

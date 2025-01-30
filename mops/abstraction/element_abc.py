@@ -25,8 +25,10 @@ if TYPE_CHECKING:
 class ElementABC(MixinABC, ABC):
 
     locator: Union[Locator, str]
-    name: str = ''
+    locator_type: str
+    log_locator: str
     parent: Union[Any, bool, None] = None
+    name: str = ''
     wait: Optional[bool] = None
 
     @property

@@ -161,18 +161,9 @@ def promote_parent_element(obj: Any, base_obj: Any, cls: Any):
         return None
 
     if is_element_instance(initial_parent) and initial_parent != base_obj:
-        for el in get_child_elements(base_obj, cls):
+        for el in get_child_elements_with_names(base_obj, cls).values():
             if obj.parent.__base_obj_id == el.__base_obj_id:
                 obj.parent = el
-
-
-def get_child_elements(obj: object, instance: Union[type, tuple]) -> list:
-    """
-    Return objects of this object by instance
-
-    :returns: list of page elements and page objects
-    """
-    return list(get_child_elements_with_names(obj, instance).values())
 
 
 def get_child_elements_with_names(obj: Any, instance: Union[type, tuple] = None) -> dict:
@@ -200,10 +191,6 @@ def get_all_attributes_from_object(reference_obj: Any) -> dict:
     :return: dict of all attributes
     """
     items = {}
-
-    if not reference_obj:
-        return items
-
     reference_class = reference_obj if inspect.isclass(reference_obj) else reference_obj.__class__
     all_bases = list(inspect.getmro(reference_class))
     all_bases.reverse()  # Reverse needed for collect subclasses attributes as base one
@@ -213,9 +200,9 @@ def get_all_attributes_from_object(reference_obj: Any) -> dict:
         if 'ABC' in str(parent_class) or parent_class == object:
             continue
 
-        items.update(dict(parent_class.__dict__))
+        items.update(get_attributes_from_object(parent_class))
 
-    return {**items, **get_attributes_from_object(reference_obj)}
+    return {**items, **get_attributes_from_object(reference_class), **get_attributes_from_object(reference_obj)}
 
 
 def get_attributes_from_object(reference_obj: Any) -> dict:
@@ -225,17 +212,7 @@ def get_attributes_from_object(reference_obj: Any) -> dict:
     :param reference_obj:
     :return:
     """
-    items = {}
-
-    if not reference_obj:
-        return items
-
-    if not inspect.isclass(reference_obj):
-        items.update(dict(reference_obj.__class__.__dict__))
-
-    items.update(dict(reference_obj.__dict__))
-
-    return items
+    return dict(reference_obj.__dict__)
 
 
 def is_target_on_screen(x: int, y: int, possible_range: Size):

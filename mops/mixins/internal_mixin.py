@@ -3,17 +3,10 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Any
 
-from appium.webdriver.common.appiumby import AppiumBy
-
 from mops.utils.internal_utils import (
     get_child_elements_with_names,
-    get_child_elements,
     get_all_attributes_from_object,
 )
-
-
-all_locator_types = get_child_elements(AppiumBy, str)
-available_kwarg_keys = ('desktop', 'mobile', 'ios', 'android')
 
 
 def get_element_info(element: Any, label: str = 'Selector=') -> str:
@@ -36,13 +29,20 @@ def get_element_info(element: Any, label: str = 'Selector=') -> str:
 def get_static_with_bases(cls: Any) -> dict:
     return get_child_elements_with_names(cls)
 
-@lru_cache(maxsize=16)
+@lru_cache(maxsize=64)
 def get_static_without_bases(cls: Any) -> dict:
     return get_all_attributes_from_object(cls)
 
+@lru_cache(maxsize=16)
+def get_driver_instance(driver, instance) -> bool:
+    return isinstance(driver, instance)
+
 class InternalMixin:
 
-    call = 0
+    driver: None
+
+    def _get_driver_instance(self, instance):
+        return get_driver_instance(self.driver, instance)
 
     def _safe_setter(self, var: str, value: Any):
         if not hasattr(self, var):

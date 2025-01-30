@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from typing import Any, Union, List, Optional
+from typing import Any, Union, Optional
 
 from mops.base.driver_wrapper import DriverWrapper
 from mops.base.element import Element
 from mops.mixins.objects.locator import Locator
 from mops.utils.internal_utils import (
     set_parent_for_attr,
-    get_child_elements,
     initialize_objects,
     get_child_elements_with_names
 )

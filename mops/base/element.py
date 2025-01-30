@@ -95,12 +95,6 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         """
         self._validate_inheritance()
 
-        if parent:
-            if not isinstance(parent, (bool, Element)):
-                error = (f'The given "parent" arg of "{self.name}" should take an Element/Group '
-                         f'object or False for skip. Get {parent}')
-                raise ValueError(error)
-
         self.locator = locator
         self.name = name if name else locator
         self.parent = parent
@@ -132,11 +126,11 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         :return: None
         """
-        if isinstance(self.driver, PlaywrightDriver):
+        if self._get_driver_instance(PlaywrightDriver):
             self._base_cls = PlayElement
-        elif isinstance(self.driver, AppiumDriver):
+        elif self._get_driver_instance(AppiumDriver):
             self._base_cls = MobileElement
-        elif isinstance(self.driver, SeleniumDriver):
+        elif self._get_driver_instance(SeleniumDriver):
             self._base_cls = WebElement
         else:
             raise DriverWrapperException(f'Cant specify {self.__class__.__name__}')
