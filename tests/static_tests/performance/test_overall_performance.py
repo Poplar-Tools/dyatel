@@ -9,7 +9,7 @@ import pytest
 from mops.base.element import Element
 from mops.base.group import Group
 from mops.base.page import Page
-
+from mops.utils.internal_utils import get_all_sub_elements
 
 section_sub_elements_count = 5000
 
@@ -129,34 +129,30 @@ def test_performance_group_initialisation(mocked_selenium_driver, case, set_grou
     stats: pstats.Stats = pstats.Stats(pr)
     stats.strip_dirs().sort_stats("time").print_stats(20)
 
-    count = len(page.sub_elements)
-    for page_object in page.sub_elements.values():
-        count += len(page_object.sub_elements)
-        for sub_element in page_object.sub_elements.values():
-            count += len(sub_element.sub_elements)
+    count = len(get_all_sub_elements(page, unique=True))
 
     print('stats.total_tt=', stats.total_tt)
     print('peak_mem=', peak_mem)
     print('cpu_time=', cpu_time)
 
     expected_peak_mem = 3.9
-    expected_init_duration = 0.7
+    expected_init_duration = 0.5
 
     if sys.version_info >= (3, 9):
         expected_peak_mem = 3.9
-        expected_init_duration = 1.2
+        expected_init_duration = 0.8
 
     if sys.version_info >= (3, 10):
         expected_peak_mem = 3.9
-        expected_init_duration = 1.2
+        expected_init_duration = 0.9
 
     if sys.version_info >= (3, 11):
         expected_peak_mem = 3.3
-        expected_init_duration = 1.45
+        expected_init_duration = 1.0
 
     if sys.version_info >= (3, 12):
         expected_peak_mem = 3.1
-        expected_init_duration = 1.75
+        expected_init_duration = 1.1
 
     assert expected_init_duration -0.5 < stats.total_tt < expected_init_duration, \
         f"Execution time too high: {stats.total_tt:.3f} sec"

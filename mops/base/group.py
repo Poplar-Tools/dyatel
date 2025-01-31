@@ -62,7 +62,6 @@ class Group(Element):
          an object containing it to be used for entire group.
         :type driver_wrapper: typing.Union[DriverWrapper, typing.Any]
         """
-        self._init_locals = locals()
         super().__init__(
             locator=locator,
             name=name,

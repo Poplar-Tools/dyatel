@@ -93,15 +93,12 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
          an object containing it to be used for this element.
         :type driver_wrapper: typing.Union[DriverWrapper, typing.Any]
         """
-        self._validate_inheritance()
-
         self.locator = locator
         self.name = name if name else locator
         self.parent = parent
         self.wait = wait
         self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
 
-        self._init_locals = getattr(self, '_init_locals', locals())
         self._safe_setter('__base_obj_id', id(self))
         self._initialized = False
 

@@ -43,6 +43,7 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
     _base_cls: Type[PlayPage, MobilePage, WebPage]
 
     anchor: Element
+    url: str
 
     def __new__(cls, *args, **kwargs):
         instance = super(Page, cls).__new__(cls)
@@ -79,9 +80,6 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
         self.log_locator = self.anchor.log_locator
         self.name = self.anchor.name
 
-        self.url = getattr(self, 'url', '')
-
-        self._init_locals = locals()
         self._modify_page_driver_wrapper(driver_wrapper)
         self._modify_sub_elements()
         self._safe_setter('__base_obj_id', id(self))

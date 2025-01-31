@@ -175,42 +175,62 @@ def get_child_elements_with_names(obj: Any, instance: Union[type, tuple] = None)
     """
     elements = {}
 
-    for attribute, value in get_all_attributes_from_object(obj).items():
-        if not instance or isinstance(value, instance):
-            if attribute != 'parent' and not attribute.startswith('__') and not attribute.endswith('__'):
-                elements.update({attribute: value})
+    if is_element(instance):
+        elements = get_all_sub_elements(obj)
+
+    if not elements:
+        for attribute, value in get_all_attributes_from_object(obj).items():
+            if not instance or isinstance(value, instance):
+                if not attribute.startswith('__') and attribute != 'parent':
+                    elements[attribute] = value
 
     return elements
 
 
+def get_all_sub_elements(instance, sub_elements: dict = None, unique: bool = False):
+    if sub_elements is None:
+        sub_elements = {}
+
+    if hasattr(instance, 'sub_elements') and instance.sub_elements:
+        for key, sub_element in instance.sub_elements.items():
+            if unique:
+                key = f'{hex(id(instance))}.{key}'
+            sub_elements[key] = sub_element
+            if hasattr(sub_element, 'sub_elements') and sub_element.sub_elements:
+                get_all_sub_elements(sub_element, sub_elements, unique=unique)
+
+    return sub_elements
+
+
 def get_all_attributes_from_object(reference_obj: Any) -> dict:
     """
-    Get attributes from given object and all its bases
+    Get attributes from the given object and all its bases.
 
     :param reference_obj: reference object
     :return: dict of all attributes
     """
     items = {}
     reference_class = reference_obj if inspect.isclass(reference_obj) else reference_obj.__class__
-    all_bases = list(inspect.getmro(reference_class))
-    all_bases.reverse()  # Reverse needed for collect subclasses attributes as base one
+    all_bases = inspect.getmro(reference_class)
 
-    for parent_class in all_bases:
-
+    for parent_class in all_bases[-2::-1]:  # Skip the reference class itself
         if 'ABC' in str(parent_class) or parent_class == object:
             continue
 
         items.update(get_attributes_from_object(parent_class))
 
-    return {**items, **get_attributes_from_object(reference_class), **get_attributes_from_object(reference_obj)}
+    items.update(get_attributes_from_object(reference_class))
+    items.update(get_attributes_from_object(reference_obj))
+
+    return items
 
 
 def get_attributes_from_object(reference_obj: Any) -> dict:
     """
-    Get attributes from given object
+    Get attributes from the given object.
 
-    :param reference_obj:
-    :return:
+    :param reference_obj: reference object
+    :return: dict of attributes
     """
     return dict(reference_obj.__dict__)
 
