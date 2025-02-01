@@ -5,6 +5,7 @@ import inspect
 import time
 from copy import copy
 from functools import lru_cache, wraps
+import extract_objects
 from typing import Any, Union, Callable, TYPE_CHECKING
 
 from selenium.common.exceptions import StaleElementReferenceException as SeleniumStaleElementReferenceException
@@ -198,12 +199,22 @@ def extract_all_named_objects(reference_obj: Any) -> dict:
         if 'ABC' in str(parent_class) or parent_class == object:
             continue
 
-        items.update(get_attributes_from_object(parent_class))
+        items.update(extract_objects.get_attributes_from_object(parent_class))
 
-    items.update(get_attributes_from_object(reference_class))
-    items.update(get_attributes_from_object(reference_obj))
+    items.update(extract_objects.get_attributes_from_object(reference_class))
+    items.update(extract_objects.get_attributes_from_object(reference_obj))
 
     return items
+
+
+def get_attributes_from_object(reference_obj: Any) -> dict:
+    """
+    Get attributes from the given object.
+
+    :param reference_obj: reference object
+    :return: dict of attributes
+    """
+    return dict(reference_obj.__dict__)
 
 
 def get_main_sub_elements(instance, sub_elements: dict = None):
@@ -217,16 +228,6 @@ def get_main_sub_elements(instance, sub_elements: dict = None):
                 get_main_sub_elements(sub_element, sub_elements)
 
     return sub_elements
-
-
-def get_attributes_from_object(reference_obj: Any) -> dict:
-    """
-    Get attributes from the given object.
-
-    :param reference_obj: reference object
-    :return: dict of attributes
-    """
-    return dict(reference_obj.__dict__)
 
 
 def is_target_on_screen(x: int, y: int, possible_range: Size):

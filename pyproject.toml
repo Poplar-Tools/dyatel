@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=75.8.0", "cython"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -52,6 +52,8 @@ dev-dependencies = [
     "selenium==4.12.0",
 
     # Tests requirements
+    "Cython",
+    "setuptools",
     "mock==4.0.3",
     "pytest==7.4.3",
     "allure-pytest==2.12.0",
@@ -80,4 +82,7 @@ version = { attr = "mops.__version__" }
 
 # Temporary workaround for https://github.com/astral-sh/uv/issues/9513, https://github.com/pypa/setuptools/issues/4759
 [tool.setuptools]
+ext-modules = [
+    {name = "extract_objects", sources = ["mops/extract_objects.pyx"]}
+]
 license-files = []

@@ -4,6 +4,7 @@ from typing import Union, Type, List, Tuple, TYPE_CHECKING
 
 from PIL import Image
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
+import extract_objects
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
 from playwright.sync_api import (
     Page as PlaywrightDriver,
@@ -20,7 +21,6 @@ from mops.selenium.driver.mobile_driver import MobileDriver
 from mops.selenium.driver.web_driver import WebDriver
 from mops.exceptions import DriverWrapperException
 from mops.mixins.internal_mixin import InternalMixin
-from mops.utils.internal_utils import get_attributes_from_object, extract_named_objects
 from mops.utils.logs import Logging, LogLevel
 
 
@@ -127,9 +127,15 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         if cls.session.sessions_count() == 0:
             cls = super().__new__(cls)
         else:
-            cls = super().__new__(type(f'ShadowDriverWrapper', (cls, ), get_attributes_from_object(cls)))  # noqa
+            cls = super().__new__(
+                type(  # noqa
+                    f'ShadowDriverWrapper',
+                    (cls, ),
+                    extract_objects.get_attributes_from_object(cls)
+                )
+            )
 
-        for name, _ in extract_named_objects(cls, bool).items():
+        for name, _ in extract_objects.extract_named_objects(cls, bool).items():
             setattr(cls, name, False)
 
         return cls

@@ -3,6 +3,7 @@ from __future__ import annotations
 from copy import copy
 from typing import Union, List, Type, Tuple, Optional, TYPE_CHECKING
 
+import extract_objects
 from PIL.Image import Image
 
 from mops.mixins.objects.wait_result import Result
@@ -30,7 +31,6 @@ from mops.utils.internal_utils import (
     WAIT_EL,
     is_target_on_screen,
     initialize_objects,
-    extract_named_objects,
     set_parent_for_attr,
     QUARTER_WAIT_EL,
     wait_condition,
@@ -755,7 +755,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         self.sub_elements = {}
 
         if type(self) is not Element:
-            self.sub_elements = extract_named_objects(self, Element)
+            self.sub_elements = extract_objects.extract_named_objects(self, Element)
             initialize_objects(self, self.sub_elements)
 
     def _modify_object(self):

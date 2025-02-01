@@ -3,6 +3,7 @@ from __future__ import annotations
 from functools import cached_property
 from typing import Union, Any, Type
 
+import extract_objects
 from playwright.sync_api import Page as PlaywrightDriver
 from appium.webdriver.webdriver import WebDriver as AppiumDriver
 from selenium.webdriver.remote.webdriver import WebDriver as SeleniumDriver
@@ -22,7 +23,6 @@ from mops.utils.previous_object_driver import PreviousObjectDriver, set_instance
 from mops.utils.internal_utils import (
     WAIT_PAGE,
     initialize_objects,
-    extract_named_objects,
     is_element_instance,
 )
 
@@ -204,7 +204,7 @@ class Page(DriverMixin, InternalMixin, Logging, PageABC):
         Initializing of attributes with type == Element.
         Required for classes with base == Page.
         """
-        self.sub_elements = extract_named_objects(self, Element)
+        self.sub_elements = extract_objects.extract_named_objects(self, Element)
         initialize_objects(self, self.sub_elements)
 
     def _modify_page_driver_wrapper(self, driver_wrapper: Any):

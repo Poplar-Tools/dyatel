@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from typing import Any, Union, Optional
 
+import extract_objects
+
 from mops.base.driver_wrapper import DriverWrapper
 from mops.base.element import Element
 from mops.mixins.objects.locator import Locator
 from mops.utils.internal_utils import (
     set_parent_for_attr,
     initialize_objects,
-    extract_named_objects
 )
 
 
@@ -71,6 +72,6 @@ class Group(Element):
         Initializing of attributes with type == Group/Element.
         Required for classes with base == Group.
         """
-        self.sub_elements = extract_named_objects(self, Element)
+        self.sub_elements = extract_objects.extract_named_objects(self, Element)
         initialize_objects(self, self.sub_elements)
         set_parent_for_attr(self)

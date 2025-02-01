@@ -3,10 +3,7 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Any
 
-from mops.utils.internal_utils import (
-    extract_named_objects,
-    extract_all_named_objects,
-)
+import extract_objects
 
 
 def get_element_info(element: Any, label: str = 'Selector=') -> str:
@@ -27,11 +24,11 @@ def get_element_info(element: Any, label: str = 'Selector=') -> str:
 
 @lru_cache(maxsize=16)
 def get_static_attributes(cls: Any) -> dict:
-    return extract_named_objects(cls)
+    return extract_objects.extract_named_objects(cls)
 
 @lru_cache(maxsize=64)
 def get_all_static_attributes(cls: Any) -> dict:
-    return extract_all_named_objects(cls)
+    return extract_objects.extract_all_named_objects(cls)
 
 @lru_cache(maxsize=16)
 def get_driver_instance(driver, instance) -> bool:
