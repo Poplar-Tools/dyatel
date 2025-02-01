@@ -8,7 +8,7 @@ from mops.mixins.objects.locator import Locator
 from mops.utils.internal_utils import (
     set_parent_for_attr,
     initialize_objects,
-    get_child_elements_with_names
+    extract_named_objects
 )
 
 
@@ -26,11 +26,7 @@ class Group(Element):
     This class provides functionality for handling element locators,
     initialization with respect to the driver, and managing sub-elements within the group.
     """
-
-    _object = 'group'
-
-    def __repr__(self):
-        return self._repr_builder()
+    _object: str = 'group'
 
     def __init__(
             self,
@@ -75,6 +71,6 @@ class Group(Element):
         Initializing of attributes with type == Group/Element.
         Required for classes with base == Group.
         """
-        self.sub_elements = get_child_elements_with_names(self, Element)
-        initialize_objects(self, self.sub_elements, Element)
-        set_parent_for_attr(self, self.sub_elements, Element)
+        self.sub_elements = extract_named_objects(self, Element)
+        initialize_objects(self, self.sub_elements)
+        set_parent_for_attr(self)

@@ -30,9 +30,8 @@ from mops.utils.internal_utils import (
     WAIT_EL,
     is_target_on_screen,
     initialize_objects,
-    get_child_elements_with_names,
+    extract_named_objects,
     set_parent_for_attr,
-    is_page,
     QUARTER_WAIT_EL,
     wait_condition,
 )
@@ -51,9 +50,13 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
     and provides a unified interface for UI interactions.
     """
 
-    _object = 'element'
+    _object: str = 'element'
+    _initialized: bool = False
     _base_cls: Type[PlayElement, MobileElement, WebElement]
+
     driver_wrapper: DriverWrapper
+    log_locator: Union[str, None] = None
+    locator_type: Union[str, None] = None
 
     def __new__(cls, *args, **kwargs):
         instance = super(Element, cls).__new__(cls)
@@ -93,14 +96,14 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
          an object containing it to be used for this element.
         :type driver_wrapper: typing.Union[DriverWrapper, typing.Any]
         """
-        self.locator = locator
-        self.name = name if name else locator
-        self.parent = parent
-        self.wait = wait
         self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
 
+        self.locator = locator
+        self.name = name or locator
+        self.parent = parent
+        self.wait = wait
+
         self._safe_setter('__base_obj_id', id(self))
-        self._initialized = False
 
         if self.driver_wrapper:
             self.__full_init__(driver_wrapper)
@@ -108,7 +111,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
     def __full_init__(self, driver_wrapper: Any = None):
         self._driver_wrapper_given = bool(driver_wrapper)
 
-        if self._driver_wrapper_given and driver_wrapper != self.driver_wrapper:
+        if driver_wrapper and driver_wrapper != self.driver_wrapper:
             self.driver_wrapper = get_driver_wrapper_from_object(driver_wrapper)
 
         self._modify_object()
@@ -123,11 +126,11 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         :return: None
         """
-        if self._get_driver_instance(PlaywrightDriver):
+        if self._driver_is_instance(PlaywrightDriver):
             self._base_cls = PlayElement
-        elif self._get_driver_instance(AppiumDriver):
+        elif self._driver_is_instance(AppiumDriver):
             self._base_cls = MobileElement
-        elif self._get_driver_instance(SeleniumDriver):
+        elif self._driver_is_instance(SeleniumDriver):
             self._base_cls = WebElement
         else:
             raise DriverWrapperException(f'Cant specify {self.__class__.__name__}')
@@ -739,7 +742,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
             wrapped_object: Any = copy(self)
             wrapped_object.element = element
             wrapped_object._wrapped = True
-            set_parent_for_attr(wrapped_object, wrapped_object.sub_elements, Element, with_copy=True)
+            set_parent_for_attr(wrapped_object, with_copy=True)
             wrapped_elements.append(wrapped_object)
 
         return wrapped_elements
@@ -752,8 +755,8 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         self.sub_elements = {}
 
         if type(self) is not Element:
-            self.sub_elements = get_child_elements_with_names(self, Element)
-            initialize_objects(self, self.sub_elements, Element)
+            self.sub_elements = extract_named_objects(self, Element)
+            initialize_objects(self, self.sub_elements)
 
     def _modify_object(self):
         """
@@ -762,12 +765,3 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         """
         if not self._driver_wrapper_given:
             PreviousObjectDriver().set_driver_from_previous_object(self)
-
-    def _validate_inheritance(self):
-        cls = self.__class__
-        mro = cls.__mro__
-
-        for item in mro:
-            if is_page(item):
-                raise TypeError(
-                    f"You cannot make an inheritance for {cls.__name__} from both Element/Group and Page objects")

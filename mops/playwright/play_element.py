@@ -35,14 +35,8 @@ class PlayElement(ElementABC, Logging, ABC):
     parent: Union[ElementABC, PlayElement]
 
     _initialized: bool
+    _is_locator_configured: bool = False
     _element: Locator = None
-
-    def __init__(self):  # noqa
-        """
-        Initializing of web element with playwright driver
-        """
-        self.locator = get_platform_locator(self)
-        set_playwright_locator(self)
 
     # Element
 
@@ -61,7 +55,11 @@ class PlayElement(ElementABC, Logging, ABC):
                 'Try to initialize base object first or call it directly as a method'
             )
 
+        if not self._is_locator_configured:
+            self._set_locator()
+
         element = self._element
+
         if not element:
             driver = self._get_base()
             element = driver.locator(self.locator)
@@ -578,3 +576,8 @@ class PlayElement(ElementABC, Logging, ABC):
         :return: first element
         """
         return self.element.first
+
+    def _set_locator(self):
+        self.locator = get_platform_locator(self)
+        set_playwright_locator(self)
+        self._is_locator_configured = True

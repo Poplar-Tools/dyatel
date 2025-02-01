@@ -4,8 +4,8 @@ from functools import lru_cache
 from typing import Any
 
 from mops.utils.internal_utils import (
-    get_child_elements_with_names,
-    get_all_attributes_from_object,
+    extract_named_objects,
+    extract_all_named_objects,
 )
 
 
@@ -26,12 +26,12 @@ def get_element_info(element: Any, label: str = 'Selector=') -> str:
     return f"{label}'{selector}'" if label else selector
 
 @lru_cache(maxsize=16)
-def get_static_with_bases(cls: Any) -> dict:
-    return get_child_elements_with_names(cls)
+def get_static_attributes(cls: Any) -> dict:
+    return extract_named_objects(cls)
 
 @lru_cache(maxsize=64)
-def get_static_without_bases(cls: Any) -> dict:
-    return get_all_attributes_from_object(cls)
+def get_all_static_attributes(cls: Any) -> dict:
+    return extract_all_named_objects(cls)
 
 @lru_cache(maxsize=16)
 def get_driver_instance(driver, instance) -> bool:
@@ -41,7 +41,7 @@ class InternalMixin:
 
     driver: None
 
-    def _get_driver_instance(self, instance):
+    def _driver_is_instance(self, instance):
         return get_driver_instance(self.driver, instance)
 
     def _safe_setter(self, var: str, value: Any):
@@ -55,13 +55,11 @@ class InternalMixin:
         :return: None
         """
         current_obj_cls = self.__class__
-        data = {
-            name: value for name, value in get_static_with_bases(cls).items()
-            if name not in get_static_without_bases(current_obj_cls)
-        }.items()
+        existing_attrs = set(get_all_static_attributes(current_obj_cls))
 
-        for name, item in data:
-            setattr(current_obj_cls, name, item)
+        for name, value in get_static_attributes(cls).items():
+            if name not in existing_attrs:
+                setattr(current_obj_cls, name, value)
 
     def _repr_builder(self: Any):
         class_name = self.__class__.__name__

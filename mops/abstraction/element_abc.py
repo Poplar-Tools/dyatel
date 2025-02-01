@@ -27,9 +27,9 @@ class ElementABC(MixinABC, ABC):
     locator: Union[Locator, str]
     locator_type: str
     log_locator: str
-    parent: Union[Any, bool, None] = None
-    name: str = ''
-    wait: Optional[bool] = None
+    name: str
+    parent: Union[Any, bool, None]
+    wait: Optional[bool]
 
     @property
     def element(self) -> Union[SeleniumWebElement, AppiumWebElement, PlayWebElement]:
@@ -878,4 +878,7 @@ class ElementABC(MixinABC, ABC):
         :type sources: tuple or list
         :return: A list of wrapped :class:`Element` objects.
         """
+        raise NotImplementedError()
+
+    def _set_locator(self):
         raise NotImplementedError()

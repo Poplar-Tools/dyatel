@@ -5,13 +5,18 @@ import inspect
 import time
 from copy import copy
 from functools import lru_cache, wraps
-from typing import Any, Union, Callable
+from typing import Any, Union, Callable, TYPE_CHECKING
+
+from selenium.common.exceptions import StaleElementReferenceException as SeleniumStaleElementReferenceException
 
 from mops.mixins.objects.size import Size
 from mops.mixins.objects.wait_result import Result
-from selenium.common.exceptions import StaleElementReferenceException as SeleniumStaleElementReferenceException
-
 from mops.exceptions import NoSuchElementException, InvalidSelectorException, TimeoutException, NoSuchParentException
+
+if TYPE_CHECKING:
+    from mops.base.element import Element
+    from mops.base.group import Group
+    from mops.base.page import Page
 
 
 WAIT_METHODS_DELAY = 0.1
@@ -95,44 +100,35 @@ def is_driver_wrapper(obj: Any) -> bool:
     return getattr(obj, '_object', None) == 'driver_wrapper'
 
 
-def initialize_objects(current_object, sub_elements: dict, instance_class: Any):
+def initialize_objects(current_object: Union[Element, Group, Page], sub_elements: dict):
     """
     Copy objects and initializing them with driver_wrapper from current object
 
     :param current_object: list of objects to initialize
     :param sub_elements: list of objects to initialize
-    :param instance_class: class of initializing objects
     :return: None
     """
     for name, obj in sub_elements.items():
         copied_obj = copy(obj)
 
-        promote_parent_element(copied_obj, current_object, instance_class)
+        promote_parent_element(copied_obj, current_object)
         sub_elements[name] = copied_obj
         setattr(current_object, name, copied_obj(driver_wrapper=current_object.driver_wrapper))
 
-        initialize_objects(copied_obj, copied_obj.sub_elements, instance_class)
+        initialize_objects(copied_obj, copied_obj.sub_elements)
 
 
-def set_parent_for_attr(
-        current_object: object,
-        sub_elements: dict,
-        instance_class: Union[type, tuple],
-        with_copy: bool = False
-):
+def set_parent_for_attr(current_object: Element, with_copy: bool = False):
     """
     Sets parent for all Elements/Group of given class.
     Should be called ONLY in Group object or all_elements method.
     Copy of objects will be executed if with_copy is True. Required for all_elements method
 
-    :param instance_class: attribute class to looking for
-    :param sub_elements: list of objects to initialize
     :param current_object: object of attribute
     :param with_copy: copy child object or not
     :return: self
     """
-
-    for name, obj in sub_elements.items():
+    for name, obj in current_object.sub_elements.items():
         if with_copy:
             obj = copy(obj)
 
@@ -140,19 +136,19 @@ def set_parent_for_attr(
             obj.parent = current_object
 
         if with_copy:
-            sub_elements[name] = obj
+            current_object.sub_elements[name] = obj
             setattr(current_object, name, obj)
 
-        set_parent_for_attr(obj, obj.sub_elements, instance_class, with_copy)
+        if obj.sub_elements:
+            set_parent_for_attr(obj, with_copy)
 
 
-def promote_parent_element(obj: Any, base_obj: Any, cls: Any):
+def promote_parent_element(obj: Any, base_obj: Any):
     """
     Promote parent object in Element if parent is another Element
 
     :param obj: any element
     :param base_obj: base object of element: Page/Group instance
-    :param cls: element class
     :return: None
     """
     initial_parent = getattr(obj, 'parent', None)
@@ -161,12 +157,12 @@ def promote_parent_element(obj: Any, base_obj: Any, cls: Any):
         return None
 
     if is_element_instance(initial_parent) and initial_parent != base_obj:
-        for el in get_child_elements_with_names(base_obj, cls).values():
+        for el in base_obj.sub_elements.values():
             if obj.parent.__base_obj_id == el.__base_obj_id:
                 obj.parent = el
 
 
-def get_child_elements_with_names(obj: Any, instance: Union[type, tuple] = None) -> dict:
+def extract_named_objects(obj: Any, instance: Union[type, tuple] = None) -> dict:
     """
     Return all objects of given object or by instance
     Removing parent attribute from list to avoid infinite recursion and all dunder attributes
@@ -176,10 +172,10 @@ def get_child_elements_with_names(obj: Any, instance: Union[type, tuple] = None)
     elements = {}
 
     if is_element(instance):
-        elements = get_all_sub_elements(obj)
+        elements = get_main_sub_elements(obj)
 
     if not elements:
-        for attribute, value in get_all_attributes_from_object(obj).items():
+        for attribute, value in extract_all_named_objects(obj).items():
             if not instance or isinstance(value, instance):
                 if not attribute.startswith('__') and attribute != 'parent':
                     elements[attribute] = value
@@ -187,22 +183,7 @@ def get_child_elements_with_names(obj: Any, instance: Union[type, tuple] = None)
     return elements
 
 
-def get_all_sub_elements(instance, sub_elements: dict = None, unique: bool = False):
-    if sub_elements is None:
-        sub_elements = {}
-
-    if hasattr(instance, 'sub_elements') and instance.sub_elements:
-        for key, sub_element in instance.sub_elements.items():
-            if unique:
-                key = f'{hex(id(instance))}.{key}'
-            sub_elements[key] = sub_element
-            if hasattr(sub_element, 'sub_elements') and sub_element.sub_elements:
-                get_all_sub_elements(sub_element, sub_elements, unique=unique)
-
-    return sub_elements
-
-
-def get_all_attributes_from_object(reference_obj: Any) -> dict:
+def extract_all_named_objects(reference_obj: Any) -> dict:
     """
     Get attributes from the given object and all its bases.
 
@@ -223,6 +204,19 @@ def get_all_attributes_from_object(reference_obj: Any) -> dict:
     items.update(get_attributes_from_object(reference_obj))
 
     return items
+
+
+def get_main_sub_elements(instance, sub_elements: dict = None):
+    if sub_elements is None:
+        sub_elements = {}
+
+    if hasattr(instance, 'sub_elements') and instance.sub_elements:
+        for key, sub_element in instance.sub_elements.items():
+            sub_elements[key] = sub_element
+            if hasattr(sub_element, 'sub_elements') and sub_element.sub_elements:
+                get_main_sub_elements(sub_element, sub_elements)
+
+    return sub_elements
 
 
 def get_attributes_from_object(reference_obj: Any) -> dict:

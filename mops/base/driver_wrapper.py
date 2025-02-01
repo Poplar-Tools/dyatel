@@ -20,7 +20,7 @@ from mops.selenium.driver.mobile_driver import MobileDriver
 from mops.selenium.driver.web_driver import WebDriver
 from mops.exceptions import DriverWrapperException
 from mops.mixins.internal_mixin import InternalMixin
-from mops.utils.internal_utils import get_attributes_from_object, get_child_elements_with_names
+from mops.utils.internal_utils import get_attributes_from_object, extract_named_objects
 from mops.utils.logs import Logging, LogLevel
 
 
@@ -129,7 +129,7 @@ class DriverWrapper(InternalMixin, Logging, DriverWrapperABC):
         else:
             cls = super().__new__(type(f'ShadowDriverWrapper', (cls, ), get_attributes_from_object(cls)))  # noqa
 
-        for name, _ in get_child_elements_with_names(cls, bool).items():
+        for name, _ in extract_named_objects(cls, bool).items():
             setattr(cls, name, False)
 
         return cls
