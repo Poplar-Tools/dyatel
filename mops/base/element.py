@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import copy
+from functools import cached_property
 from typing import Union, List, Type, Tuple, Optional, TYPE_CHECKING
 
 from PIL.Image import Image
@@ -49,7 +50,6 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
     It dynamically adapts to different driver types (Playwright, Appium, Selenium)
     and provides a unified interface for UI interactions.
     """
-
     _object: str = 'element'
     _initialized: bool = False
     _base_cls: Type[PlayElement, MobileElement, WebElement]
@@ -747,21 +747,35 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
         return wrapped_elements
 
-    def _modify_sub_elements(self):
+    def _modify_sub_elements(self) -> None:
         """
         Initializing of attributes with  type == Element.
         Required for classes with base == Element.
+
+        :return: :obj:`None`
         """
         self.sub_elements = {}
 
-        if type(self) is not Element:
+        if type(self) is not self._element_cls:
             self.sub_elements = extract_named_objects(self, Element)
             initialize_objects(self, self.sub_elements)
 
-    def _modify_object(self):
+    def _modify_object(self) -> None:
         """
         Modify current object if driver_wrapper is not given. Required for Page that placed into functions:
         - sets driver from previous object
+
+        :return: :obj:`None`
         """
         if not self._driver_wrapper_given:
             PreviousObjectDriver().set_driver_from_previous_object(self)
+
+    @cached_property
+    def _element_cls(self) -> Type[Element]:
+        """
+        Returns the `Element` class.
+        This can be overridden for performance optimizations.
+
+        :return: :obj:`typing.Type` [:class:`Element`]
+        """
+        return Element
