@@ -25,11 +25,11 @@ if TYPE_CHECKING:
 class ElementABC(MixinABC, ABC):
 
     locator: Union[Locator, str]
-    locator_type: str
-    log_locator: str
     name: str
     parent: Union[Any, bool, None]
     wait: Optional[bool]
+
+    _locator_type: Union[str, None] = None
 
     @property
     def element(self) -> Union[SeleniumWebElement, AppiumWebElement, PlayWebElement]:

@@ -9,7 +9,7 @@ import pytest
 from mops.base.element import Element
 from mops.base.group import Group
 from mops.base.page import Page
-from mops.utils.internal_utils import get_all_sub_elements
+from mops.shared_utils import get_all_sub_elements
 
 section_sub_elements_count = 5000
 
@@ -67,29 +67,38 @@ def test_performance_element_initialisation(mocked_selenium_driver, case, set_el
     stats: pstats.Stats = pstats.Stats(pr)
     stats.strip_dirs().sort_stats("time").print_stats(20)
 
+    init_without_profiling_start_timestamp = time.time()
+    AnotherSection1()
+    init_without_profiling_stop_timestamp = time.time() - init_without_profiling_start_timestamp
+
     print('stats.total_tt=', stats.total_tt)
     print('peak_mem=', peak_mem)
     print('cpu_time=', cpu_time)
+    print('init_without_profiling_stop_timestamp=', init_without_profiling_stop_timestamp)
 
-    expected_peak_mem = 5.3
-    expected_init_duration = 0.6
+    expected_peak_mem = 4.7
+    expected_init_duration = 0.4
+    init_without_profiling_expected = 0.1
 
     if sys.version_info >= (3, 9):
-        expected_peak_mem = 5.3
-        expected_init_duration = 0.65
+        expected_peak_mem = 4.7
+        expected_init_duration = 0.4
+        init_without_profiling_expected = 0.13
     if sys.version_info >= (3, 10):
-        expected_peak_mem = 5.3
-        expected_init_duration = 0.7
-    if sys.version_info >= (3, 11):
         expected_peak_mem = 4.6
-        expected_init_duration = 1.0
+        expected_init_duration = 0.4
+    if sys.version_info >= (3, 11):
+        expected_peak_mem = 4.0
+        expected_init_duration = 0.6
     if sys.version_info >= (3, 12):
-        expected_peak_mem = 4.4
-        expected_init_duration = 1.2
+        expected_peak_mem = 3.8
+        expected_init_duration = 0.45
 
-    assert expected_init_duration -0.5 < stats.total_tt < expected_init_duration,\
+    assert init_without_profiling_stop_timestamp < init_without_profiling_expected,\
+        f'Execution without profiling takes too much time: {init_without_profiling_stop_timestamp}'
+    assert expected_init_duration -0.25 < stats.total_tt < expected_init_duration,\
         f"Execution time too high: {stats.total_tt:.3f} sec"
-    assert expected_peak_mem -1 < peak_mem < expected_peak_mem,\
+    assert expected_peak_mem - 0.8 < peak_mem < expected_peak_mem,\
         f"Peak memory usage too high: {peak_mem:.2f} MB"
     assert len(section.sub_elements) == section_sub_elements_count, \
         f"Expected {section_sub_elements_count} elements, got {len(section.sub_elements)}"
@@ -127,36 +136,42 @@ def test_performance_group_initialisation(mocked_selenium_driver, case, set_grou
     tracemalloc.stop()
 
     stats: pstats.Stats = pstats.Stats(pr)
-    stats.strip_dirs().sort_stats("time").print_stats(20)
+    stats.strip_dirs().sort_stats("time").print_stats(200)
 
-    count = len(get_all_sub_elements(page, unique=True))
+    count = len(get_all_sub_elements(page))
+    init_without_profiling_start_timestamp = time.time()
+    SomePage()
+    init_without_profiling_stop_timestamp = time.time() - init_without_profiling_start_timestamp
 
     print('stats.total_tt=', stats.total_tt)
     print('peak_mem=', peak_mem)
     print('cpu_time=', cpu_time)
+    print('init_without_profiling_stop_timestamp=', init_without_profiling_stop_timestamp)
 
-    expected_peak_mem = 3.9
-    expected_init_duration = 0.5
+    expected_peak_mem = 3.2
+    expected_init_duration = 0.4
 
     if sys.version_info >= (3, 9):
-        expected_peak_mem = 3.9
-        expected_init_duration = 0.8
+        expected_peak_mem = 3.5
+        expected_init_duration = 0.5
 
     if sys.version_info >= (3, 10):
-        expected_peak_mem = 3.9
-        expected_init_duration = 0.9
+        expected_peak_mem = 3.3
+        expected_init_duration = 0.4
 
     if sys.version_info >= (3, 11):
-        expected_peak_mem = 3.3
-        expected_init_duration = 1.0
+        expected_peak_mem = 2.6
+        expected_init_duration = 0.75
 
     if sys.version_info >= (3, 12):
-        expected_peak_mem = 3.1
-        expected_init_duration = 1.1
+        expected_peak_mem = 2.5
+        expected_init_duration = 0.7
 
-    assert expected_init_duration -0.5 < stats.total_tt < expected_init_duration, \
+    assert init_without_profiling_stop_timestamp < 0.15,\
+        f'Execution without profiling takes too much time: {init_without_profiling_stop_timestamp}'
+    assert expected_init_duration -0.25 < stats.total_tt < expected_init_duration, \
         f"Execution time too high: {stats.total_tt:.3f} sec"
-    assert expected_peak_mem -1 < peak_mem < expected_peak_mem, \
+    assert expected_peak_mem -0.8 < peak_mem < expected_peak_mem, \
         f"Peak memory usage too high: {peak_mem:.2f} MB"
     assert cpu_time < expected_init_duration, f"CPU execution time too high: {cpu_time:.3f} sec"
     assert count > 3600, f"Expected 3600 elements, got {count}"

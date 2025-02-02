@@ -52,11 +52,10 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
     """
     _object: str = 'element'
     _initialized: bool = False
+    _is_locator_configured: bool = False
     _base_cls: Type[PlayElement, MobileElement, WebElement]
 
     driver_wrapper: DriverWrapper
-    log_locator: Union[str, None] = None
-    locator_type: Union[str, None] = None
 
     def __new__(cls, *args, **kwargs):
         instance = super(Element, cls).__new__(cls)
@@ -138,6 +137,36 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         self._set_static(self._base_cls)
         self._base_cls.__init__(self)
         self._initialized = True
+
+    @property
+    def locator(self):
+        if not self._is_locator_configured:
+            self._set_locator()
+
+        return self._locator
+
+    @locator.setter
+    def locator(self, value: Union[Locator, str]):
+        self._log_locator = value
+        self._locator = value
+
+    @property
+    def locator_type(self):
+        if not self._is_locator_configured:
+            self._set_locator()
+
+        return self._locator_type
+
+    @locator_type.setter
+    def locator_type(self, value: str):
+        self._locator_type = value
+
+    @property
+    def log_locator(self):
+        if not self._is_locator_configured:
+            self._set_locator()
+
+        return self._log_locator
 
     # Following methods works same for both Selenium/Appium and Playwright APIs using internal methods
 
@@ -749,7 +778,7 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
 
     def _modify_sub_elements(self) -> None:
         """
-        Initializing of attributes with  type == Element.
+        Initializing of attributes with type == Element.
         Required for classes with base == Element.
 
         :return: :obj:`None`

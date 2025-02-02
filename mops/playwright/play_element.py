@@ -55,9 +55,6 @@ class PlayElement(ElementABC, Logging, ABC):
                 'Try to initialize base object first or call it directly as a method'
             )
 
-        if not self._is_locator_configured:
-            self._set_locator()
-
         element = self._element
 
         if not element:

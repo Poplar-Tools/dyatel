@@ -621,9 +621,6 @@ class CoreElement(ElementABC, ABC):
         self._cached_element = None
 
         try:
-            if not self._is_locator_configured:
-                self._set_locator()
-
             element = base.find_element(self.locator_type, self.locator)
             self._cached_element = element
             return element
@@ -643,9 +640,6 @@ class CoreElement(ElementABC, ABC):
         self._cached_element = None
 
         try:
-            if not self._is_locator_configured:
-                self._set_locator()
-
             elements = base.find_elements(self.locator_type, self.locator)
 
             if elements:
