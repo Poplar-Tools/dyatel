@@ -50,12 +50,11 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
     It dynamically adapts to different driver types (Playwright, Appium, Selenium)
     and provides a unified interface for UI interactions.
     """
+
     _object: str = 'element'
     _initialized: bool = False
     _is_locator_configured: bool = False
     _base_cls: Type[PlayElement, MobileElement, WebElement]
-
-    driver_wrapper: DriverWrapper
 
     def __new__(cls, *args, **kwargs):
         instance = super(Element, cls).__new__(cls)
@@ -139,30 +138,30 @@ class Element(DriverMixin, InternalMixin, Logging, ElementABC):
         self._initialized = True
 
     @property
-    def locator(self):
+    def locator(self) -> str:
         if not self._is_locator_configured:
             self._set_locator()
 
         return self._locator
 
     @locator.setter
-    def locator(self, value: Union[Locator, str]):
+    def locator(self, value: Union[Locator, str]) -> None:
         self._log_locator = value
         self._locator = value
 
     @property
-    def locator_type(self):
+    def locator_type(self) -> str:
         if not self._is_locator_configured:
             self._set_locator()
 
         return self._locator_type
 
     @locator_type.setter
-    def locator_type(self, value: str):
+    def locator_type(self, value: str) -> None:
         self._locator_type = value
 
     @property
-    def log_locator(self):
+    def log_locator(self) -> str:
         if not self._is_locator_configured:
             self._set_locator()
 

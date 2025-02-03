@@ -165,7 +165,7 @@ def test_performance_group_initialisation(mocked_selenium_driver, case, set_grou
 
     if sys.version_info >= (3, 12):
         expected_peak_mem = 2.5
-        expected_init_duration = 0.7
+        expected_init_duration = 0.6
 
     assert init_without_profiling_stop_timestamp < 0.15,\
         f'Execution without profiling takes too much time: {init_without_profiling_stop_timestamp}'

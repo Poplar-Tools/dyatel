@@ -44,11 +44,9 @@ if TYPE_CHECKING:
 
 class CoreElement(ElementABC, ABC):
 
-    parent: Union[Element]
-    locator_type: str
+    parent: Union[Element, CoreElement]
 
     _initialized: bool
-    _is_locator_configured: bool = False
     _element: Union[None, SeleniumWebElement, AppiumWebElement] = None
     _cached_element: Union[None, SeleniumWebElement, AppiumWebElement] = None
 

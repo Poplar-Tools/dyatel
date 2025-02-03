@@ -9,7 +9,7 @@ from mops.keyboard_keys import KeyboardKeys
 from mops.mixins.objects.scrolls import ScrollTo, ScrollTypes
 from playwright.sync_api import TimeoutError as PlayTimeoutError, Error
 from playwright.sync_api import Page as PlaywrightPage
-from playwright.sync_api import Locator, Page, Browser, BrowserContext
+from playwright.sync_api import Locator
 
 from mops.mixins.objects.size import Size
 from mops.mixins.objects.location import Location
@@ -29,13 +29,9 @@ from mops.utils.internal_utils import (
 
 class PlayElement(ElementABC, Logging, ABC):
 
-    instance: Browser
-    context: BrowserContext
-    driver: Page
     parent: Union[ElementABC, PlayElement]
 
     _initialized: bool
-    _is_locator_configured: bool = False
     _element: Locator = None
 
     # Element
