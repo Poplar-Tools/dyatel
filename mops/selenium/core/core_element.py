@@ -35,7 +35,7 @@ from mops.exceptions import (
     DriverWrapperException,
     NoSuchElementException,
     ElementNotInteractableException,
-    NoSuchParentException,
+    NoSuchParentException, NotInitializedException,
 )
 
 if TYPE_CHECKING:
@@ -44,8 +44,9 @@ if TYPE_CHECKING:
 
 class CoreElement(ElementABC, ABC):
 
-    parent: Union[Element]
-    locator_type: str
+    parent: Union[Element, CoreElement]
+
+    _initialized: bool
     _element: Union[None, SeleniumWebElement, AppiumWebElement] = None
     _cached_element: Union[None, SeleniumWebElement, AppiumWebElement] = None
 
@@ -58,6 +59,12 @@ class CoreElement(ElementABC, ABC):
 
         :return: SeleniumWebElement
         """
+        if not self._initialized:
+            raise NotInitializedException(
+                f'{repr(self)} object is not initialized. '
+                'Try to initialize base object first or call it directly as a method'
+            )
+
         return self._get_element()
 
     @element.setter

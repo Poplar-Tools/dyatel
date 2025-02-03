@@ -1,9 +1,7 @@
-from types import SimpleNamespace
-
 import pytest
 from selenium.webdriver.common.by import By
 
-from mops.utils.selector_synchronizer import set_selenium_selector, set_playwright_locator
+from mops.base.element import Element
 
 
 @pytest.mark.parametrize(
@@ -23,9 +21,7 @@ from mops.utils.selector_synchronizer import set_selenium_selector, set_playwrig
     ],
 )
 def test_set_selenium_selector(locator_input, expected_locator, expected_locator_type, expected_log_locator):
-    mock_obj = SimpleNamespace()
-    mock_obj.locator = locator_input
-    set_selenium_selector(mock_obj)
+    mock_obj = Element(locator_input)
     assert expected_locator == mock_obj.locator
     assert expected_log_locator == mock_obj.log_locator
 
@@ -45,10 +41,8 @@ def test_set_selenium_selector(locator_input, expected_locator, expected_locator
         ("[href='/some/url']", "css=[href='/some/url']"),
     ],
 )
-def test_set_playwright_locator(locator_input, expected_locator):
-    mock_obj = SimpleNamespace()
-    mock_obj.locator = locator_input
-    set_playwright_locator(mock_obj)
+def test_set_playwright_locator(locator_input, expected_locator, mocked_play_driver):
+    mock_obj = Element(locator_input)
     assert expected_locator == mock_obj.locator
     assert expected_locator == mock_obj.log_locator
     assert expected_locator.partition('=')[0] == mock_obj.locator_type
